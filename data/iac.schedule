@@ -1,0 +1,12 @@
+<apps>
+  <app>
+    <duration-seconds>10</duration-seconds>
+    <launch-path>/Users/bill/Desktop/MPEBouncingBall1.app</launch-path>
+    <kill-name>MPEBouncingBall1</kill-name>
+  </app>
+  <app>
+    <duration-seconds>10</duration-seconds>
+    <launch-path>/Applications/Arduino.app</launch-path>
+    <kill-name>Arduino</kill-name>
+  </app>
+</apps>

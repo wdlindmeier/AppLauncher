@@ -1,0 +1,10 @@
+<loop>false</loop>
+<auto-advance>false</auto-advance>
+<schedule-file>./schedule.xml</shedule-file>
+<machines>
+  <remote>
+    <user>bill</user>
+    <ip-address>10.0.1.2</ip-address>
+  </remote>
+  <local>true</local>
+</machines>
