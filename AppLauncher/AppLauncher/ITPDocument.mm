@@ -66,7 +66,7 @@
     _sockets = [[NSMutableDictionary alloc] initWithCapacity:1];
     
     NSString *hostAddress = @"127.0.0.1";
-    int hostPort = 1234;
+    int hostPort = kConnectionPort;
     
     // TODO: Make a loop for all clients
     GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:self
@@ -135,13 +135,13 @@
     NSString *response = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
 	NSLog(@"socket:%p didReadData:%@ withTag:%ld", sock, response, tag);
     
-    NSArray *tokens = [response componentsSeparatedByString:@"~~"];
+    NSArray *tokens = [response componentsSeparatedByString:kCommandParamDelim];
     
     if (tokens.count > 0)
     {
         NSString *command = tokens[0];
         // TODO: This should varify that it's the correct app name
-        if ([command isEqualToString:@"LAUNCHED"] && self.numAppsLaunched < self.sockets.count)
+        if ([command isEqualToString:kCommandAppWasLaunched] && self.numAppsLaunched < self.sockets.count)
         {
             self.numAppsLaunched += 1;;
             
@@ -158,7 +158,7 @@
                 });
             }
         }
-        else if ([command isEqualToString:@"KILLED"] && self.numAppsLaunched > 0)
+        else if ([command isEqualToString:kCommandAppWasKilled] && self.numAppsLaunched > 0)
         {
             self.numAppsLaunched -= 1;
             
@@ -170,16 +170,48 @@
                 });
             }
         }
-        else if ([command isEqualToString:@"ERROR"])
+        else if ([command isEqualToString:kCommandError])
         {
-            if (tokens.count > 1)
+            if (tokens.count > 3)
             {
                 NSString *errorTask = tokens[1];
-                NSLog(@"ERROR completing task: %@", errorTask);
+                NSString *appName = tokens[2];
+                NSString *errorReason = tokens[3];
+                if (!errorReason || errorReason.length == 0)
+                {
+                    if ([errorTask isEqualToString:kCommandKillApp])
+                    {
+                        errorReason = @"Unknown. Make sure your kill name is correct.";
+                    }
+                    else if([errorTask isEqualToString:kCommandLaunchApp])
+                    {
+                        errorReason = @"Unknown. Make sure your launch path is correct and the same on all machines.";
+                    }
+                    else
+                    {
+                        errorReason = @"Unknown";
+                    }
+                }
+                NSLog(@"ERROR completing task: %@ on app %@. Reason:\n%@", errorTask, appName, errorReason);
+                
+                if ([errorTask isEqualToString:kCommandKillApp])
+                {
+                    // Set the current app index so reset doesn't try to kill it again.
+                    _currentAppIndex = -1;
+                }
                 dispatch_async(dispatch_get_main_queue(), ^{
                     // Kill everything
                     [self buttonStopPressed:nil];
                 });
+                
+                NSAlert *alert = [NSAlert alertWithMessageText:@"Error completing task"
+                                                 defaultButton:@"OK"
+                                               alternateButton:nil
+                                                   otherButton:nil
+                                     informativeTextWithFormat:@"There was an error completing the task: %@\nApp: %@\nReason: %@",
+                                  errorTask, appName, errorReason];
+                [alert runModal];
+                
             }
         }
     }
@@ -258,7 +290,7 @@
     [self handleLastXMLElement];
     _xmlElementName = elementName;
     _xmlElementValue = [[NSMutableString alloc] init];
-    if ([_xmlElementName isEqualToString:@"app"])
+    if ([_xmlElementName isEqualToString:kXMLElementApp])
     {
         _lastApp = [ITPApp new];
         [_apps addObject:_lastApp];
@@ -282,17 +314,21 @@
 - (void)handleLastXMLElement
 {
     NSString *value = [_xmlElementValue stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-    if ([_xmlElementName isEqualToString:@"duration-seconds"])
+    if ([_xmlElementName isEqualToString:kXMLElementDurationSeconds])
     {
         _lastApp.durationSeconds = @([value integerValue]);
     }
-    else if ([_xmlElementName isEqualToString:@"launch-path"])
+    else if ([_xmlElementName isEqualToString:kXMLElementLaunchPath])
     {
         _lastApp.path = value;
     }
-    else if ([_xmlElementName isEqualToString:@"kill-name"])
+    else if ([_xmlElementName isEqualToString:kXMLElementKillName])
     {
         _lastApp.killName = value;
+    }
+    else if ([_xmlElementName isEqualToString:kXMLElementWallpaperPath])
+    {
+        _lastApp.wallpaperPath = value;
     }
 }
 
@@ -303,11 +339,6 @@
     if (!_isPlaying)
     {
         return;
-    }
-    
-    if (_currentAppIndex > -1 && _currentAppIndex < _apps.count)
-    {
-        [self killApp:_apps[_currentAppIndex]];
     }
 
     _currentAppIndex++;
@@ -343,7 +374,14 @@
 
     self.numAppsLaunched = 0;
     
-    NSString *message = [NSString stringWithFormat:@"LAUNCH~~%@~~%@", app.killName, app.path];
+    NSString *message = [NSString stringWithFormat:@"%@%@%@%@%@%@%@",
+                         kCommandLaunchApp,
+                         kCommandParamDelim,
+                         app.killName,
+                         kCommandParamDelim,
+                         app.path,
+                         kCommandParamDelim,
+                         app.wallpaperPath];
     for (NSString *hostName in _sockets)
     {
         [self sendMessage:message toSocket:_sockets[hostName]];
@@ -355,8 +393,11 @@
     [_timer invalidate];
     _timer = nil;
     
-    NSString *killMessage = [NSString stringWithFormat:@"KILL~~%@~~%i",
+    NSString *killMessage = [NSString stringWithFormat:@"%@%@%@%@%i",
+                             kCommandKillApp,
+                             kCommandParamDelim,
                              app.killName,
+                             kCommandParamDelim,
                              [app.pid intValue]];
     
     for (NSString *hostName in _sockets)

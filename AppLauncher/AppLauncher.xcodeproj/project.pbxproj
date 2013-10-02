@@ -20,9 +20,6 @@
 		A9039FD117EE6E2900C28835 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = A9039FCF17EE6E2900C28835 /* InfoPlist.strings */; };
 		A9039FD317EE6E2900C28835 /* AppLauncherTests.m in Sources */ = {isa = PBXBuildFile; fileRef = A9039FD217EE6E2900C28835 /* AppLauncherTests.m */; };
 		A9039FDE17EE783000C28835 /* ITPAppLauncherApplication.m in Sources */ = {isa = PBXBuildFile; fileRef = A9039FDD17EE783000C28835 /* ITPAppLauncherApplication.m */; };
-		A9039FE217EE849E00C28835 /* remote_kill in Resources */ = {isa = PBXBuildFile; fileRef = A9039FE017EE849E00C28835 /* remote_kill */; };
-		A9039FE317EE849E00C28835 /* remote_launch in Resources */ = {isa = PBXBuildFile; fileRef = A9039FE117EE849E00C28835 /* remote_launch */; };
-		A9039FE517EE939D00C28835 /* remote_pkill in Resources */ = {isa = PBXBuildFile; fileRef = A9039FE417EE939D00C28835 /* remote_pkill */; };
 		A903A06F17F641AA00C28835 /* GCDAsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = A903A06E17F641AA00C28835 /* GCDAsyncSocket.m */; };
 		A903A07317F6452300C28835 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A903A07217F6452300C28835 /* Security.framework */; };
 		A903A07617F65FD000C28835 /* ITPApp.m in Sources */ = {isa = PBXBuildFile; fileRef = A903A07517F65FD000C28835 /* ITPApp.m */; };
@@ -61,14 +58,12 @@
 		A9039FD217EE6E2900C28835 /* AppLauncherTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppLauncherTests.m; sourceTree = "<group>"; };
 		A9039FDC17EE783000C28835 /* ITPAppLauncherApplication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ITPAppLauncherApplication.h; sourceTree = "<group>"; };
 		A9039FDD17EE783000C28835 /* ITPAppLauncherApplication.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ITPAppLauncherApplication.m; sourceTree = "<group>"; };
-		A9039FE017EE849E00C28835 /* remote_kill */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = remote_kill; path = ../scripts/remote_kill; sourceTree = "<group>"; };
-		A9039FE117EE849E00C28835 /* remote_launch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = remote_launch; path = ../scripts/remote_launch; sourceTree = "<group>"; };
-		A9039FE417EE939D00C28835 /* remote_pkill */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = remote_pkill; path = ../scripts/remote_pkill; sourceTree = "<group>"; };
 		A903A06D17F641AA00C28835 /* GCDAsyncSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncSocket.h; sourceTree = "<group>"; };
 		A903A06E17F641AA00C28835 /* GCDAsyncSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncSocket.m; sourceTree = "<group>"; };
 		A903A07217F6452300C28835 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		A903A07417F65FD000C28835 /* ITPApp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ITPApp.h; sourceTree = "<group>"; };
 		A903A07517F65FD000C28835 /* ITPApp.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ITPApp.m; sourceTree = "<group>"; };
+		A9D8A6B217FC6AA10080A0EE /* AppLauncherConsts.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppLauncherConsts.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -97,7 +92,6 @@
 			isa = PBXGroup;
 			children = (
 				A903A06C17F6419E00C28835 /* Socket */,
-				A9039FDF17EE846000C28835 /* scripts */,
 				A9039FAB17EE6E2900C28835 /* AppLauncher */,
 				A9039FCC17EE6E2900C28835 /* AppLauncherTests */,
 				A9039FA417EE6E2900C28835 /* Frameworks */,
@@ -138,16 +132,17 @@
 		A9039FAB17EE6E2900C28835 /* AppLauncher */ = {
 			isa = PBXGroup;
 			children = (
+				A9D8A6B217FC6AA10080A0EE /* AppLauncherConsts.h */,
+				A9039FC017EE6E2900C28835 /* Images.xcassets */,
 				A903A07417F65FD000C28835 /* ITPApp.h */,
 				A903A07517F65FD000C28835 /* ITPApp.m */,
+				A9039FDC17EE783000C28835 /* ITPAppLauncherApplication.h */,
+				A9039FDD17EE783000C28835 /* ITPAppLauncherApplication.m */,
 				A9039FB717EE6E2900C28835 /* ITPDocument.h */,
 				A9039FB817EE6E2900C28835 /* ITPDocument.mm */,
 				A9039FBA17EE6E2900C28835 /* ITPDocument.xib */,
 				A9039FBD17EE6E2900C28835 /* MainMenu.xib */,
-				A9039FC017EE6E2900C28835 /* Images.xcassets */,
 				A9039FAC17EE6E2900C28835 /* Supporting Files */,
-				A9039FDC17EE783000C28835 /* ITPAppLauncherApplication.h */,
-				A9039FDD17EE783000C28835 /* ITPAppLauncherApplication.m */,
 			);
 			path = AppLauncher;
 			sourceTree = "<group>";
@@ -180,16 +175,6 @@
 				A9039FCF17EE6E2900C28835 /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		A9039FDF17EE846000C28835 /* scripts */ = {
-			isa = PBXGroup;
-			children = (
-				A9039FE417EE939D00C28835 /* remote_pkill */,
-				A9039FE017EE849E00C28835 /* remote_kill */,
-				A9039FE117EE849E00C28835 /* remote_launch */,
-			);
-			name = scripts;
 			sourceTree = "<group>";
 		};
 		A903A06C17F6419E00C28835 /* Socket */ = {
@@ -278,12 +263,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A9039FE217EE849E00C28835 /* remote_kill in Resources */,
 				A9039FB017EE6E2900C28835 /* InfoPlist.strings in Resources */,
 				A9039FC117EE6E2900C28835 /* Images.xcassets in Resources */,
-				A9039FE517EE939D00C28835 /* remote_pkill in Resources */,
 				A9039FBC17EE6E2900C28835 /* ITPDocument.xib in Resources */,
-				A9039FE317EE849E00C28835 /* remote_launch in Resources */,
 				A9039FB617EE6E2900C28835 /* Credits.rtf in Resources */,
 				A9039FBF17EE6E2900C28835 /* MainMenu.xib in Resources */,
 			);

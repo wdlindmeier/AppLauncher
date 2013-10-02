@@ -10,4 +10,16 @@
 
 @implementation ITPApp
 
+- (id)init
+{
+    self = [super init];
+    if (self)
+    {
+        self.wallpaperPath = @"";
+        self.durationSeconds = 0;
+        self.pid = nil;
+    }
+    return self;
+}
+
 @end

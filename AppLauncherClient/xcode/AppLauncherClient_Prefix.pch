@@ -1,5 +1,6 @@
 #ifdef __OBJC__
     #import <Cocoa/Cocoa.h>
+    #include "AppLauncherConsts.h"
 #endif
 
 #if defined( __cplusplus )

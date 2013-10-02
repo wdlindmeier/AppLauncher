@@ -12,6 +12,7 @@
 
 @property (nonatomic, strong) NSString *path;
 @property (nonatomic, strong) NSString *killName;
+@property (nonatomic, strong) NSString *wallpaperPath;
 @property (nonatomic, strong) NSNumber *durationSeconds;
 @property (nonatomic, strong) NSNumber *pid;
 

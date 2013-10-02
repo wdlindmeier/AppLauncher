@@ -20,6 +20,7 @@
 		A903A07117F644D900C28835 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A903A07017F644D900C28835 /* Security.framework */; };
 		A903A07917F66DDB00C28835 /* ITPApp.m in Sources */ = {isa = PBXBuildFile; fileRef = A903A07817F66DDB00C28835 /* ITPApp.m */; };
 		A903A08C17F67CE100C28835 /* app_grep in Resources */ = {isa = PBXBuildFile; fileRef = A903A08B17F67CE100C28835 /* app_grep */; };
+		A9D8A6AC17FC5F030080A0EE /* ConnectionManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = A9D8A6AB17FC5F030080A0EE /* ConnectionManager.mm */; };
 		FDC12845666A413982CB09A3 /* CinderApp.icns in Resources */ = {isa = PBXBuildFile; fileRef = EF90EBA90F5245C3A51E72D3 /* CinderApp.icns */; };
 /* End PBXBuildFile section */
 
@@ -44,6 +45,10 @@
 		A903A07717F66DDB00C28835 /* ITPApp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ITPApp.h; path = ../../AppLauncher/AppLauncher/ITPApp.h; sourceTree = "<group>"; };
 		A903A07817F66DDB00C28835 /* ITPApp.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ITPApp.m; path = ../../AppLauncher/AppLauncher/ITPApp.m; sourceTree = "<group>"; };
 		A903A08B17F67CE100C28835 /* app_grep */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = app_grep; sourceTree = "<group>"; };
+		A9D8A6AB17FC5F030080A0EE /* ConnectionManager.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ConnectionManager.mm; path = ../src/ConnectionManager.mm; sourceTree = "<group>"; };
+		A9D8A6AD17FC5F150080A0EE /* ConnectionManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ConnectionManager.h; path = ../include/ConnectionManager.h; sourceTree = "<group>"; };
+		A9D8A6B117FC679B0080A0EE /* DisplayApp.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = DisplayApp.hpp; path = ../include/DisplayApp.hpp; sourceTree = "<group>"; };
+		A9D8A6B317FC6CB80080A0EE /* AppLauncherConsts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppLauncherConsts.h; path = ../../AppLauncher/AppLauncher/AppLauncherConsts.h; sourceTree = "<group>"; };
 		B22F69E153244993ADB1F38F /* AppLauncherClient_Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = "\"\""; path = AppLauncherClient_Prefix.pch; sourceTree = "<group>"; };
 		EF90EBA90F5245C3A51E72D3 /* CinderApp.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = CinderApp.icns; path = ../resources/CinderApp.icns; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -71,8 +76,9 @@
 		080E96DDFE201D6D7F000001 /* Source */ = {
 			isa = PBXGroup;
 			children = (
-				A903A07817F66DDB00C28835 /* ITPApp.m */,
 				46E8D23CE9834B438C15957B /* AppLauncherClientApp.mm */,
+				A9D8A6AB17FC5F030080A0EE /* ConnectionManager.mm */,
+				A903A07817F66DDB00C28835 /* ITPApp.m */,
 			);
 			name = Source;
 			sourceTree = "<group>";
@@ -126,9 +132,12 @@
 		29B97315FDCFA39411CA2CEA /* Headers */ = {
 			isa = PBXGroup;
 			children = (
+				B22F69E153244993ADB1F38F /* AppLauncherClient_Prefix.pch */,
+				A9D8A6B317FC6CB80080A0EE /* AppLauncherConsts.h */,
+				A9D8A6AD17FC5F150080A0EE /* ConnectionManager.h */,
+				A9D8A6B117FC679B0080A0EE /* DisplayApp.hpp */,
 				A903A07717F66DDB00C28835 /* ITPApp.h */,
 				5926AD3FD9A44A3D82574473 /* Resources.h */,
-				B22F69E153244993ADB1F38F /* AppLauncherClient_Prefix.pch */,
 			);
 			name = Headers;
 			sourceTree = "<group>";
@@ -235,6 +244,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A903A06B17F63F9200C28835 /* GCDAsyncSocket.m in Sources */,
+				A9D8A6AC17FC5F030080A0EE /* ConnectionManager.mm in Sources */,
 				510CB7F55A774FA0A28DA3ED /* AppLauncherClientApp.mm in Sources */,
 				A903A07917F66DDB00C28835 /* ITPApp.m in Sources */,
 			);
@@ -247,6 +257,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
+				CINDER_PATH = /Users/bill/Tools/cinder_master;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
@@ -274,6 +285,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
+				CINDER_PATH = /Users/bill/Tools/cinder_master;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEAD_CODE_STRIPPING = YES;
