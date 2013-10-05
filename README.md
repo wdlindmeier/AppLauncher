@@ -26,15 +26,21 @@ When AppLauncher is run, you must open a .schedule file. You can find a sample i
     <!-- The same machine the launcher is running on -->
     <client-ip>127.0.0.1</client-ip>
   </machines>
+  <!-- The list of apps to run. -->
   <apps>
     <app>
-      <!-- The duration is seconds that the app should run. -->
+      <!-- 	The duration, in seconds, that the app should run. -->
       <duration-seconds>10</duration-seconds>
-      <!-- The absolute path to the application. This must be the same on all machines. -->
+      <!-- 	The absolute path to the application.  
+      This must be the same on all machines. -->
       <launch-path>/silly_apps/apps/SillyApp0.app</launch-path>
-      <!-- The absolute path to the wallpaper. This image is shown behind the launched application. Optional. -->
+      <!-- 	The absolute path to the wallpaper. 
+      	   	This image is shown behind the launched application. 
+      		Optional. -->
       <wallpaper-path>/silly_apps/wallpapers/wallpaper_0.jpeg</wallpaper-path>
-      <!-- The app "kill name". This is used as a unique identifier and should be the same name used with the pkill command. This is generally the name of the app bundle minus the ".app". -->
+      <!-- 	The app "kill name". This is used as a unique identifier and 
+      		should be the same name used with the pkill command. 
+      		This is generally the name of the app bundle minus the ".app". -->
       <kill-name>SillyApp0</kill-name>
     </app>
     <app>
