@@ -8,6 +8,8 @@ Launches can be times, looped and automatically advanced on an arbitrary number 
 [Video](http://www.youtube.com/watch?v=TMVnVEth684):  
 http://www.youtube.com/watch?v=TMVnVEth684
 
+![image](https://raw.github.com/wdlindmeier/AppLauncher/master/misc/launcher_screenshot.png)
+
 ##Contents
 
 * *AppLauncher*: The code for the controller application. Starts and stops apps on all machines.
