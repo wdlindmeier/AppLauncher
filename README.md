@@ -1,7 +1,7 @@
 AppLauncher
 ===========
 
-##Overview
+###Overview
 An application that launches other applications on remote machines.  
 Launches can be times, looped and automatically advanced on an arbitrary number of machines.
 
@@ -10,7 +10,7 @@ http://www.youtube.com/watch?v=TMVnVEth684
 
 ![image](https://raw.github.com/wdlindmeier/AppLauncher/master/misc/launcher_screenshot.png)
 
-##Instructions
+###Instructions
 1) Create a directory on all of the client machines that contatins the apps and wallpapers. This path must be identical on each machine.  
 
 2) Open apps/AppLauncherClient on all of the client machines. This app coordinates with the Launcher to start and stop local processes. The client opens in full-screen mode, but this can be toggled by pressing 'f'.  
@@ -87,13 +87,13 @@ http://www.youtube.com/watch?v=TMVnVEth684
 ```
 4) Press the Start button to begin the schedule. The schedule will begin on whatever app is selected in the table view.
 
-##Contents
+###Contents
 
-* *AppLauncher*: The code for the controller application. Starts and stops apps on all machines.
-* *AppLauncherClient*: The code for the client application. Launches apps locally on each machine. 
-* *SillyApp*: Sample apps to start and stop.
-* *apps*: Builds of the above applications (for OS X).
-* *data*: .schedule files, which is what the AppLauncher reads.
-* *misc*: ...
-* *wallpapers*: Background images displayed by the client behind the launched app.
-* *README.md*: This file.
+* **AppLauncher/**: The code for the controller application. Starts and stops apps on all machines.
+* **AppLauncherClient/**: The code for the client application. Launches apps locally on each machine. 
+* **SillyApp/**: Sample apps to start and stop.
+* **apps/**: Builds of the above applications (for OS X).
+* **data/**: .schedule files, which is what the AppLauncher reads.
+* **misc/**: ...
+* **wallpapers/**: Background images displayed by the client behind the launched app.
+* **README.md**: This file.
