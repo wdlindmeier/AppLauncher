@@ -1,4 +1,4 @@
-<settings>
+<schedule>
   <loop>false</loop>
   <auto-advance>true</auto-advance>
   <machines>
@@ -31,4 +31,4 @@
       <kill-name>SillyApp3</kill-name>
     </app>
   </apps>
-</settings>
+</schedule>

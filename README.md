@@ -11,10 +11,14 @@ http://www.youtube.com/watch?v=TMVnVEth684
 ![image](https://raw.github.com/wdlindmeier/AppLauncher/master/misc/launcher_screenshot.png)
 
 ##Instructions
-When AppLauncher is run, you must open a .schedule file. You can find a sample in the "data" folder. The format:  
+1) Create a directory on all of the client machines that contatins the apps and wallpapers. This path must be identical on each machine.  
+
+2) Open apps/AppLauncherClient on all of the client machines. This app coordinates with the Launcher to start and stop local processes. The client opens in full-screen mode, but this can be toggled by pressing 'f'.  
+
+3) Open AppLauncher on the controller machine. When it boots, you'll be asked to select a .schedule file. You can find a sample in the "data" folder. This is the format to create your own:  
 
 ```xml
-<settings>
+<schedule>
   
   <!-- Should the schedule loop or not? -->
   <loop>false</loop>
@@ -45,7 +49,7 @@ When AppLauncher is run, you must open a .schedule file. You can find a sample i
       		This must be the same on all machines. 
       		Required.
       -->
-      <launch-path>/silly_apps/apps/SillyApp0.app</launch-path>
+      <launch-path>/AppLauncher/apps/SillyApp0.app</launch-path>
       
       <!-- 	kill-name:
       		The app "kill name". This is used as a unique identifier and 
@@ -60,25 +64,28 @@ When AppLauncher is run, you must open a .schedule file. You can find a sample i
       	   	This image is shown behind the launched application. 
       		Optional. 
       -->
-      <wallpaper-path>/silly_apps/wallpapers/wallpaper_0.jpeg</wallpaper-path>
+      <wallpaper-path>/AppLauncher/wallpapers/wallpaper_0.jpeg</wallpaper-path>
     </app>
     
     <app>
       <duration-seconds>5</duration-seconds>
-      <launch-path>/silly_apps/apps/SillyApp1.app</launch-path>
+      <launch-path>/AppLauncher/apps/SillyApp1.app</launch-path>
       <kill-name>SillyApp1</kill-name>
-      <wallpaper-path>/silly_apps/wallpapers/wallpaper_1.jpg</wallpaper-path>
+      <wallpaper-path>/AppLauncher/wallpapers/wallpaper_1.jpg</wallpaper-path>
     </app>
     
     <app>
       <duration-seconds>10</duration-seconds>
-      <launch-path>/silly_apps/SillyApp2.app</launch-path>
+      <launch-path>/AppLauncher/SillyApp2.app</launch-path>
       <kill-name>SillyApp2</kill-name>
-      <wallpaper-path>/silly_apps/wallpapers/wallpaper_2.png</wallpaper-path>
+      <wallpaper-path>/AppLauncher/wallpapers/wallpaper_2.png</wallpaper-path>
     </app>
+    
   </apps>
-</settings>
+  
+</schedule>
 ```
+4) Press the Start button to begin the schedule. The schedule will begin on whatever app is selected in the table view.
 
 ##Contents
 

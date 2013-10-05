@@ -10,7 +10,7 @@
 
 @implementation ITPAppLauncherApplication
 {
-    NSDocumentController *_documentController;
+//    NSDocumentController *_documentController;
 }
 
 - (id)init
@@ -38,7 +38,8 @@
 - (void)finishLaunching
 {
     [super finishLaunching];
-    // Look for a settings file
+    // Ask for a settings file
+    [[NSDocumentController sharedDocumentController] openDocument:nil];
 }
 
 @end
