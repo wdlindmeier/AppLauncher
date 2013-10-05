@@ -1,0 +1,4 @@
+#!/bin/sh
+# $1 is the app path
+
+ps -ax | grep $1
