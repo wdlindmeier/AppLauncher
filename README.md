@@ -1,7 +1,7 @@
 AppLauncher
 ===========
 
-## Overview
+##Overview
 An application that launches other applications on remote machines.  
 Launches can be times, looped and automatically advanced on an arbitrary number of machines.
 
@@ -9,6 +9,49 @@ Launches can be times, looped and automatically advanced on an arbitrary number 
 http://www.youtube.com/watch?v=TMVnVEth684
 
 ![image](https://raw.github.com/wdlindmeier/AppLauncher/master/misc/launcher_screenshot.png)
+
+##Instructions
+When AppLauncher is run, you must open a .schedule file. You can find a sample in the "data" folder. The format:  
+
+```xml
+<settings>
+  <!-- Should the schedule loop or not? -->
+  <loop>false</loop>
+  <!-- Should the apps auto advance? -->
+  <auto-advance>true</auto-advance>
+  <!-- IP Addresses of each client machine. -->
+  <machines>
+  	<!-- A remote machine -->
+    <client-ip>10.0.1.2</client-ip>
+    <!-- The same machine the launcher is running on -->
+    <client-ip>127.0.0.1</client-ip>
+  </machines>
+  <apps>
+    <app>
+      <!-- The duration is seconds that the app should run. -->
+      <duration-seconds>10</duration-seconds>
+      <!-- The absolute path to the application. This must be the same on all machines. -->
+      <launch-path>/silly_apps/apps/SillyApp0.app</launch-path>
+      <!-- The absolute path to the wallpaper. This image is shown behind the launched application. Optional. -->
+      <wallpaper-path>/silly_apps/wallpapers/wallpaper_0.jpeg</wallpaper-path>
+      <!-- The app "kill name". This is used as a unique identifier and should be the same name used with the pkill command. This is generally the name of the app bundle minus the ".app". -->
+      <kill-name>SillyApp0</kill-name>
+    </app>
+    <app>
+      <duration-seconds>5</duration-seconds>
+      <launch-path>/silly_apps/apps/SillyApp1.app</launch-path>
+      <wallpaper-path>/silly_apps/wallpapers/wallpaper_1.jpg</wallpaper-path>
+      <kill-name>SillyApp1</kill-name>
+    </app>
+    <app>
+      <duration-seconds>10</duration-seconds>
+      <launch-path>/silly_apps/SillyApp2.app</launch-path>
+      <wallpaper-path>/silly_apps/wallpapers/wallpaper_2.png</wallpaper-path>
+      <kill-name>SillyApp2</kill-name>
+    </app>
+  </apps>
+</settings>
+```
 
 ##Contents
 
