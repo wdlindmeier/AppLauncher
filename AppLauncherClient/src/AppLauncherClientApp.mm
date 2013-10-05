@@ -39,6 +39,7 @@ void AppLauncherClientApp::prepareSettings(Settings *settings)
 void AppLauncherClientApp::setup()
 {
     setWindowPos(0, 0);
+    setFullScreen(true);
     clearWallpaper();
     mConnectionManager = [[ConnectionManager alloc] initWithApp:this];
     [mConnectionManager connectOnPort:kConnectionPort];

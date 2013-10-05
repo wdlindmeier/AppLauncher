@@ -38,11 +38,7 @@
 - (void)finishLaunching
 {
     [super finishLaunching];
-    /*
-    NSDocumentController *docController = [NSDocumentController sharedDocumentController];
-    [docController runModalOpenPanel:[NSOpenPanel openPanel] forTypes:@[@"schedule"]];
-    */
-    // How do I load up the results?
+    // Look for a settings file
 }
 
 @end

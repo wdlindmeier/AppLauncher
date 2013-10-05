@@ -13,6 +13,9 @@ static NSString * const kXMLElementDurationSeconds = @"duration-seconds";
 static NSString * const kXMLElementLaunchPath = @"launch-path";
 static NSString * const kXMLElementKillName = @"kill-name";
 static NSString * const kXMLElementWallpaperPath = @"wallpaper-path";
+static NSString * const kXMLElementShouldLoop = @"loop";
+static NSString * const kXMLElementAutoAdvance = @"auto-advance";
+static NSString * const kXMLElementClientIP = @"client-ip";
 
 static NSString * const kCommandAppWasKilled = @"KILLED";
 static NSString * const kCommandError = @"ERROR";

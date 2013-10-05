@@ -10,10 +10,13 @@
 #import "ITPApp.h"
 #include "GCDAsyncSocket.h"
 
+typedef void (^ConnectionCompletionBlock)(void);
+
 @interface ITPDocument()
 
 @property (atomic, assign) int numAppsLaunched;
 @property (atomic, strong) NSMutableDictionary *sockets;
+@property (atomic, strong) ConnectionCompletionBlock connectedBlock;
 
 @end
 
@@ -22,6 +25,7 @@
     NSString *_xmlElementName;
     NSMutableString *_xmlElementValue;
     NSMutableArray *_apps;
+    NSMutableArray *_clientAddresses;
     ITPApp *_lastApp;
     int _currentAppIndex;
     NSTimer *_timer;
@@ -36,6 +40,7 @@
     {
         _xmlElementName = nil;
         _currentAppIndex = -1;
+        self.connectedBlock = nil;
     }
     return self;
 }
@@ -63,27 +68,72 @@
     
     [self updateViewForApps];
     
-    _sockets = [[NSMutableDictionary alloc] initWithCapacity:1];
-    
-    NSString *hostAddress = @"127.0.0.1";
-    int hostPort = kConnectionPort;
-    
-    // TODO: Make a loop for all clients
-    GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:self
-                                                       delegateQueue:dispatch_get_main_queue()];
-    NSError *connectError = nil;
-    if (![socket connectToHost:hostAddress onPort:hostPort error:&connectError])
+    [self connectToHosts];
+}
+
+- (void)connectToHosts
+{
+    self.sockets = [[NSMutableDictionary alloc] initWithCapacity:1];
+
+    for (NSString *clientIP in _clientAddresses)
     {
-        NSLog(@"ERROR: Couldn't connect to socket: %@", connectError);
+        GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:self
+                                                            delegateQueue:dispatch_get_main_queue()];
+        
+        NSError *connectError = nil;
+        if (![socket connectToHost:clientIP onPort:kConnectionPort error:&connectError])
+        {
+            NSLog(@"ERROR: Couldn't connect to socket: %@", connectError);
+        }
+        
+        // Always add the socket event if it doesn't
+        // connect because we can reconnect later
+        self.sockets[clientIP] = socket;
     }
-    else
+}
+
+- (void)performUponConnection:(ConnectionCompletionBlock)completionBlock
+{
+    self.connectedBlock = completionBlock;
+    int numConnected = 0;
+
+    // Make sure all of the sockets are connected
+    for (NSString *hostName in self.sockets)
     {
-        NSLog(@"Connected to %@:%i", hostAddress, hostPort);
-        [socket readDataWithTimeout:-1 tag:0];
+        GCDAsyncSocket *socket = self.sockets[hostName];
+        
+        if (socket.isConnected)
+        {
+            numConnected += 1;
+        }
+        else
+        {
+            NSError *connectError = nil;
+            if (![socket connectToHost:hostName
+                                onPort:kConnectionPort
+                                 error:&connectError])
+            {
+                self.connectedBlock = nil;
+
+                NSString *errorMessage = [NSString stringWithFormat:@"Couldn't reconnect to host %@\n%@",
+                                          hostName,
+                                          [connectError localizedDescription]];
+                NSLog(@"CONNECTION ERROR:\n%@", connectError);
+                
+                NSAlert *alert = [NSAlert alertWithMessageText:@"Connection Error"
+                                                 defaultButton:@"OK"
+                                               alternateButton:nil
+                                                   otherButton:nil
+                                     informativeTextWithFormat:@"%@", errorMessage];
+                [alert runModal];
+            }
+        }
     }
-    
-    _sockets[hostAddress] = socket;
-    
+    if (numConnected == self.sockets.count)
+    {
+        self.connectedBlock = nil;
+        completionBlock();
+    }
 }
 
 - (void)updateViewForApps
@@ -118,6 +168,24 @@
 - (void)socket:(GCDAsyncSocket *)sock didConnectToHost:(NSString *)host port:(UInt16)port
 {
 	NSLog(@"socket:%p didConnectToHost:%@ port:%hu", sock, host, port);
+    if (self.connectedBlock)
+    {
+        BOOL allAreConnected = YES;
+        for (NSString *hostName in self.sockets)
+        {
+            GCDAsyncSocket *socket = self.sockets[hostName];
+            if (!socket.isConnected)
+            {
+                allAreConnected = NO;
+                break;
+            }
+        }
+        if (allAreConnected)
+        {
+            dispatch_async(dispatch_get_main_queue(), self.connectedBlock);
+            self.connectedBlock = nil;
+        }
+    }
 }
 
 - (void)socketDidSecure:(GCDAsyncSocket *)sock
@@ -133,7 +201,7 @@
 - (void)socket:(GCDAsyncSocket *)sock didReadData:(NSData *)data withTag:(long)tag
 {
     NSString *response = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-	NSLog(@"socket:%p didReadData:%@ withTag:%ld", sock, response, tag);
+//	NSLog(@"socket:%p didReadData:%@ withTag:%ld", sock, response, tag);
     
     NSArray *tokens = [response componentsSeparatedByString:kCommandParamDelim];
     
@@ -204,7 +272,8 @@
                     [self buttonStopPressed:nil];
                 });
                 
-                NSAlert *alert = [NSAlert alertWithMessageText:@"Error completing task"
+                NSString *titleString = [NSString stringWithFormat:@"Error on %@", sock.connectedHost];
+                NSAlert *alert = [NSAlert alertWithMessageText:titleString
                                                  defaultButton:@"OK"
                                                alternateButton:nil
                                                    otherButton:nil
@@ -221,7 +290,30 @@
 
 - (void)socketDidDisconnect:(GCDAsyncSocket *)sock withError:(NSError *)err
 {
-	NSLog(@"socketDidDisconnect:%p withError: %@", sock, err);
+	NSLog(@"socketDidDisconnect: %p withError: %@", sock, err);
+    NSLog(@"HOST: %@", sock.connectedHost);
+    if (self.connectedBlock)
+    {
+        self.connectedBlock = nil;
+        NSString *disconnectedHost = nil;
+        for (NSString *hostName in self.sockets)
+        {
+            if (self.sockets[hostName] == sock)
+            {
+                disconnectedHost = hostName;
+                break;
+            }
+        }
+        if (disconnectedHost)
+        {
+            NSAlert *alert = [NSAlert alertWithMessageText:@"Client Disconnected"
+                                             defaultButton:@"OK"
+                                           alternateButton:nil
+                                               otherButton:nil
+                                 informativeTextWithFormat:@"%@ has disconnected.", disconnectedHost];
+            [alert runModal];
+        }
+    }
 }
 
 #pragma mark - Socket Communication
@@ -246,11 +338,11 @@
 - (void)disconnectSockets
 {
     // Stop any client connections
-    @synchronized(_sockets)
+    @synchronized(self.sockets)
     {
-        for (NSString *hostName in _sockets)
+        for (NSString *hostName in self.sockets)
         {
-            [(GCDAsyncSocket *)_sockets[hostName] disconnect];
+            [(GCDAsyncSocket *)self.sockets[hostName] disconnect];
         }
     }
 }
@@ -282,7 +374,8 @@
 - (void)parserDidStartDocument:(NSXMLParser *)parser
 {
     //the parser started this document. what are you going to do?
-    _apps = [[NSMutableArray alloc] init];
+    _apps = [NSMutableArray new];
+    _clientAddresses = [NSMutableArray new];
 }
 
 - (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qualifiedName attributes:(NSDictionary *)attributeDict
@@ -306,9 +399,16 @@
 {
     [self handleLastXMLElement];
     _xmlElementName = nil;
-    NSLog(@"Done loading document. Apps:");
-    NSLog(@"%@", _apps);
+    NSLog(@"Done loading document.\nApps:\n%@\nClients:\n%@", _apps, _clientAddresses);
     [self updateViewForApps];
+}
+
+BOOL XMLToBOOL(NSString *xmlValue)
+{
+    NSString *lcv = [[xmlValue lowercaseString]
+                     stringByTrimmingCharactersInSet:[NSCharacterSet 
+                                                      whitespaceAndNewlineCharacterSet]];
+    return lcv && lcv.length > 0 && ([lcv isEqualToString:@"1"] || [lcv isEqualToString:@"true"]);
 }
 
 - (void)handleLastXMLElement
@@ -329,6 +429,18 @@
     else if ([_xmlElementName isEqualToString:kXMLElementWallpaperPath])
     {
         _lastApp.wallpaperPath = value;
+    }
+    else if ([_xmlElementName isEqualToString:kXMLElementShouldLoop])
+    {
+        self.shouldLoop = XMLToBOOL(value);
+    }
+    else if ([_xmlElementName isEqualToString:kXMLElementAutoAdvance])
+    {
+        self.shouldAutoAdvance = XMLToBOOL(value);
+    }
+    else if ([_xmlElementName isEqualToString:kXMLElementClientIP])
+    {
+        [_clientAddresses addObject:value];
     }
 }
 
@@ -363,55 +475,63 @@
 
 - (void)launchApp:(ITPApp *)app
 {
-    [self.tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:_currentAppIndex]
-                byExtendingSelection:NO];
-
-    [self.buttonStart setEnabled:NO];
-    [self.buttonStop setEnabled:YES];
-
-    self.currentAppName = app.killName;
-    self.currentTimeRemaining = @"--";
-
-    self.numAppsLaunched = 0;
+    [self performUponConnection:^() {
+        
+        [self.tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:_currentAppIndex]
+                    byExtendingSelection:NO];
+        
+        [self.buttonStart setEnabled:NO];
+        [self.buttonStop setEnabled:YES];
+        
+        self.currentAppName = app.killName;
+        self.currentTimeRemaining = @"--";
+        
+        self.numAppsLaunched = 0;
+        
+        NSString *message = [NSString stringWithFormat:@"%@%@%@%@%@%@%@",
+                             kCommandLaunchApp,
+                             kCommandParamDelim,
+                             app.killName,
+                             kCommandParamDelim,
+                             app.path,
+                             kCommandParamDelim,
+                             app.wallpaperPath];
+        for (NSString *hostName in self.sockets)
+        {
+            [self sendMessage:message toSocket:self.sockets[hostName]];
+        }
     
-    NSString *message = [NSString stringWithFormat:@"%@%@%@%@%@%@%@",
-                         kCommandLaunchApp,
-                         kCommandParamDelim,
-                         app.killName,
-                         kCommandParamDelim,
-                         app.path,
-                         kCommandParamDelim,
-                         app.wallpaperPath];
-    for (NSString *hostName in _sockets)
-    {
-        [self sendMessage:message toSocket:_sockets[hostName]];
-    }
+    }];
 }
 
 - (void)killApp:(ITPApp *)app
 {
-    [_timer invalidate];
-    _timer = nil;
+    [self performUponConnection:^() {
     
-    NSString *killMessage = [NSString stringWithFormat:@"%@%@%@%@%i",
-                             kCommandKillApp,
-                             kCommandParamDelim,
-                             app.killName,
-                             kCommandParamDelim,
-                             [app.pid intValue]];
-    
-    for (NSString *hostName in _sockets)
-    {
-        [self sendMessage:killMessage toSocket:_sockets[hostName]];
-    }
-    
-    app.pid = nil;
-    
-    [self.buttonStart setEnabled:YES];
-    [self.buttonStop setEnabled:NO];
-    
-    self.currentAppName = @"None";
-    self.currentTimeRemaining = @"--";
+        [_timer invalidate];
+        _timer = nil;
+        
+        NSString *killMessage = [NSString stringWithFormat:@"%@%@%@%@%i",
+                                 kCommandKillApp,
+                                 kCommandParamDelim,
+                                 app.killName,
+                                 kCommandParamDelim,
+                                 [app.pid intValue]];
+        
+        for (NSString *hostName in self.sockets)
+        {
+            [self sendMessage:killMessage toSocket:self.sockets[hostName]];
+        }
+        
+        app.pid = nil;
+        
+        [self.buttonStart setEnabled:YES];
+        [self.buttonStop setEnabled:NO];
+        
+        self.currentAppName = @"None";
+        self.currentTimeRemaining = @"--";
+        
+    }];
 }
 
 #pragma mark - Timer
