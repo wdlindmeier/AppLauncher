@@ -5,8 +5,8 @@ AppLauncher
 An application that launches other applications on remote machines.  
 Launches can be times, looped and automatically advanced on an arbitrary number of machines.
 
-[Video](http://www.youtube.com/watch?v=TMVnVEth684):  
-http://www.youtube.com/watch?v=TMVnVEth684
+[Video](http://www.youtube.com/watch?v=Z4A6BD6035w):  
+http://www.youtube.com/watch?v=Z4A6BD6035w
 
 ![image](https://raw.github.com/wdlindmeier/AppLauncher/master/misc/launcher_screenshot.png)
 
