@@ -1,4 +1,4 @@
 #!/bin/sh
 # $1 is the app path
-
-ps -ax | grep $1
+# Kind of a hack, but we want to capture multuple strings
+ps -ax | grep "$1 $2 $3 $4 $5 $6"

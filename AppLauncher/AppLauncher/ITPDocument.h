@@ -22,6 +22,8 @@ NSTableViewDelegate>
 
 @property (nonatomic, assign) BOOL shouldLoop;
 @property (nonatomic, assign) BOOL shouldAutoAdvance;
+@property (nonatomic, assign) BOOL isDebug;
+@property (nonatomic, assign) NSTimeInterval timeSleepBetweenLaunches;
 
 @property (nonatomic, assign) NSString *currentAppName;
 @property (nonatomic, assign) NSString *currentTimeRemaining;

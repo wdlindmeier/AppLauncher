@@ -1,0 +1,37 @@
+<schedule>
+  <loop>false</loop>
+  <auto-advance>true</auto-advance>
+  <debug>true</debug>
+  <duration-interlude-seconds>3.0</duration-interlude-seconds>
+  <machines>
+    <client-ip>192.168.0.1</client-ip>
+    <client-ip>192.168.0.2</client-ip>
+    <client-ip>192.168.0.3</client-ip>
+  </machines>
+  <apps>
+    <app>
+      <duration-seconds>10</duration-seconds>
+      <launch-path>/Users/bigscreens/Documents/launcher/apps/SillyApp0.app</launch-path>
+      <wallpaper-path>/Users/bigscreens/Documents/launcher/wallpapers/wallpaper_0.jpeg</wallpaper-path>
+      <kill-name>SillyApp0</kill-name>
+    </app>
+    <app>
+      <duration-seconds>5</duration-seconds>
+      <launch-path>/Users/bigscreens/Documents/launcher/apps/SillyApp1.app</launch-path>
+      <wallpaper-path>/Users/bigscreens/Documents/launcher/wallpapers/wallpaper_1.jpg</wallpaper-path>
+      <kill-name>SillyApp1</kill-name>
+    </app>
+    <app>
+      <duration-seconds>10</duration-seconds>
+      <launch-path>/Users/bigscreens/Documents/launcher/apps/SillyApp2.app</launch-path>
+      <wallpaper-path>/Users/bigscreens/Documents/launcher/wallpapers/wallpaper_2.png</wallpaper-path>
+      <kill-name>SillyApp2</kill-name>
+    </app>
+    <app>
+      <duration-seconds>3</duration-seconds>
+      <launch-path>/Users/bigscreens/Documents/launcher/apps/SillyApp3.app</launch-path>
+      <wallpaper-path>/Users/bigscreens/Documents/launcher/wallpapers/wallpaper_3.jpg</wallpaper-path>
+      <kill-name>SillyApp3</kill-name>
+    </app>
+  </apps>
+</schedule>

@@ -20,13 +20,31 @@ http://www.youtube.com/watch?v=Z4A6BD6035w
 ```xml
 <schedule>
   
-  <!-- Should the schedule loop or not? -->
+  <!-- 	loop:
+  		Should the schedule loop or not? 
+  -->
   <loop>false</loop>
   
-  <!-- Should the apps auto advance? -->
+  <!-- 	auto-advance:
+  	   	Should the apps auto advance? 
+  -->
   <auto-advance>true</auto-advance>
   
-  <!-- IP Addresses of each client machine. -->
+  <!-- 	debug:
+		When debug is true, the app will present (more) Alert dialogs 
+  	   	if things go wrong. 
+  -->  
+  <debug>true</debug>
+  
+  <!-- 	duration-interlude-seconds:
+  		The number of seconds to wait between apps. 
+  		3+ is recommended to transition out of full-screen mode. 
+  -->
+  <duration-interlude-seconds>3.0</duration-interlude-seconds>
+  
+  <!-- 	machines:
+  		The IP Addresses of each client machine. 
+  -->
   <machines>
   	<!-- A remote machine -->
     <client-ip>10.0.1.2</client-ip>
@@ -34,12 +52,16 @@ http://www.youtube.com/watch?v=Z4A6BD6035w
     <client-ip>127.0.0.1</client-ip>
   </machines>
   
-  <!-- The list of apps to run. -->
+  <!-- 	apps:
+  		The list of apps to run. 
+  -->
   <apps>
   
     <app>
       <!-- 	duration-seconds:
-      		The duration, in seconds, that the app should run. 
+      		The duration in seconds that the app should run. 
+      		If this value is 0, the launcher won't quit the app
+			until the "stop" button is pressed.
       		Required.
       -->
       <duration-seconds>10</duration-seconds>

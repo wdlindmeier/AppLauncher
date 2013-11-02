@@ -90,18 +90,31 @@
         
         if ([command isEqualToString:@"LAUNCH"])
         {
-            if (tokens.count > 2)
+            if (tokens.count > 3)
             {
-                app.path = tokens[2];
+                app.type = (AppLaunchType)[(NSString *)tokens[3] intValue];
+                if (app.type == AppLaunchTypeCommand)
+                {
+                    app.command = tokens[2];
+                }
+                else if (app.type == AppLaunchTypeWebURL)
+                {
+                    app.webURL = tokens[2];
+                }
+                else if (app.type == AppLaunchTypeAppPath)
+                {
+                    app.path = tokens[2];
+                }
             }
             else
             {
                 NSLog(@"ERROR: Couldn't find app path to launch");
                 return;
             }
-            if (tokens.count > 3)
+
+            if (tokens.count > 4)
             {
-                app.wallpaperPath = tokens[3];
+                app.wallpaperPath = tokens[4];
             }
             else
             {
@@ -145,9 +158,35 @@
     NSString *killName = app.killName;
     
     NSTask *task = [[NSTask alloc] init];
-    [task setLaunchPath:@"/usr/bin/open"];
-    
-    NSLog(@"Launching app: %@", app.path);
+    NSString *grepName = nil;
+    if (app.type == AppLaunchTypeCommand)
+    {
+        NSLog(@"Launching command: %@", app.command);
+        NSArray *commandComponents = [app.command componentsSeparatedByString:@" "];
+        NSString *launchPath = commandComponents[0];
+        [task setLaunchPath:launchPath];
+        grepName = launchPath;
+        if (commandComponents.count > 1)
+        {
+            [task setArguments:[commandComponents subarrayWithRange:NSMakeRange(1, commandComponents.count - 1)]];
+        }
+    }
+    else if (app.type == AppLaunchTypeWebURL)
+    {
+        NSString *commandPath = @"/usr/bin/osascript"; // Apple script
+        NSString *scriptPath = [[NSBundle mainBundle] pathForResource:@"openChromeURL" ofType:@"scpt"];
+        NSLog(@"Launching url: %@", app.webURL);
+        [task setLaunchPath:commandPath];
+        grepName = @"\"Google Chrome\""; // ?
+        [task setArguments:@[scriptPath, app.webURL]];
+    }
+    else if (app.type == AppLaunchTypeAppPath)
+    {
+        NSLog(@"Launching app: %@", app.path);
+        [task setLaunchPath:@"/usr/bin/open"];
+        [task setArguments:@[app.path]];
+        grepName = app.path;
+    }
     
     if (app.wallpaperPath)
     {
@@ -167,9 +206,7 @@
             _displayApp->clearWallpaper();
         });
     }
-    
-    [task setArguments:@[app.path]];
-    
+
     NSPipe *pipe = [NSPipe pipe];
     [task setStandardOutput:pipe];
     
@@ -206,7 +243,7 @@
         NSString *scriptPath = [[NSBundle mainBundle] pathForResource:@"app_grep" ofType:nil];
         [grepTask setLaunchPath:scriptPath];
         
-        [grepTask setArguments:@[app.path]];
+        [grepTask setArguments:@[grepName]];
         
         NSPipe *pipe = [NSPipe pipe];
         [grepTask setStandardOutput:pipe];
@@ -286,14 +323,17 @@
     
     NSString *killName = app.killName;
     NSString *scriptPath = nil;
+    BOOL isKillingWithPID = false;
     if (app.pid && [app.pid intValue] != 0)
     {
+        isKillingWithPID = true;
         NSLog(@"Attempting to kill pid: >>%@<<", app.pid);
         scriptPath = @"/bin/kill";
         [task setArguments: @[[app.pid stringValue]]];
     }
     else
     {
+        NSLog(@"Attempting to kill app named: >>%@<<", app.killName);
         scriptPath = @"/usr/bin/pkill";
         [task setArguments: @[app.killName]];
     }
@@ -312,21 +352,30 @@
             NSData *data = [file readDataToEndOfFile];
             NSString *errorString = [[NSString alloc] initWithData:data encoding: NSUTF8StringEncoding];
 
-            NSLog(@"Kill returned error status: %@", errorString);
-            dispatch_async(dispatch_get_main_queue(), ^{
-                // Tell the server that we've launched
-                [_serverSocket writeData:[[NSString stringWithFormat:@"%@%@%@%@%@%@%@",
-                                           kCommandError,
-                                           kCommandParamDelim,
-                                           kCommandKillApp,
-                                           kCommandParamDelim,
-                                           app.killName,
-                                           kCommandParamDelim,
-                                           errorString]
-                                          dataUsingEncoding:NSUTF8StringEncoding]
-                             withTimeout:-1
-                                     tag:0];
-            });
+            if (isKillingWithPID)
+            {
+                // NOTE: If killing using a PID throws an error, try killing with it's name
+                app.pid = nil;
+                return [self killApp:app];
+            }
+            else
+            {
+                NSLog(@"Kill returned error status: %@", errorString);
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    // Tell the server that we've launched
+                    [_serverSocket writeData:[[NSString stringWithFormat:@"%@%@%@%@%@%@%@",
+                                               kCommandError,
+                                               kCommandParamDelim,
+                                               kCommandKillApp,
+                                               kCommandParamDelim,
+                                               app.killName,
+                                               kCommandParamDelim,
+                                               errorString]
+                                              dataUsingEncoding:NSUTF8StringEncoding]
+                                 withTimeout:-1
+                                         tag:0];
+                });
+            }
             return;
         }
         

@@ -41,6 +41,9 @@ typedef void (^ConnectionCompletionBlock)(void);
         _xmlElementName = nil;
         _currentAppIndex = -1;
         self.connectedBlock = nil;
+        self.isDebug = true;
+        self.timeSleepBetweenLaunches = 3.0f;
+
     }
     return self;
 }
@@ -233,7 +236,9 @@ typedef void (^ConnectionCompletionBlock)(void);
             if (self.numAppsLaunched <= 0 && self.shouldAutoAdvance)
             {
                 NSLog(@"ALL APPS KILLED. Advancing.");
-                dispatch_async(dispatch_get_main_queue(), ^{
+                double delayInSeconds = self.timeSleepBetweenLaunches;
+                dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+                dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
                     [self launchNextApp];
                 });
             }
@@ -273,14 +278,16 @@ typedef void (^ConnectionCompletionBlock)(void);
                 });
                 
                 NSString *titleString = [NSString stringWithFormat:@"Error on %@", sock.connectedHost];
-                NSAlert *alert = [NSAlert alertWithMessageText:titleString
-                                                 defaultButton:@"OK"
-                                               alternateButton:nil
-                                                   otherButton:nil
-                                     informativeTextWithFormat:@"There was an error completing the task: %@\nApp: %@\nReason: %@",
-                                  errorTask, appName, errorReason];
-                [alert runModal];
-                
+                if (self.isDebug)
+                {
+                    NSAlert *alert = [NSAlert alertWithMessageText:titleString
+                                                     defaultButton:@"OK"
+                                                   alternateButton:nil
+                                                       otherButton:nil
+                                         informativeTextWithFormat:@"There was an error completing the task: %@\nApp: %@\nReason: %@",
+                                      errorTask, appName, errorReason];
+                    [alert runModal];
+                }
             }
         }
     }
@@ -306,12 +313,15 @@ typedef void (^ConnectionCompletionBlock)(void);
         }
         if (disconnectedHost)
         {
-            NSAlert *alert = [NSAlert alertWithMessageText:@"Client Disconnected"
-                                             defaultButton:@"OK"
-                                           alternateButton:nil
-                                               otherButton:nil
-                                 informativeTextWithFormat:@"%@ has disconnected.", disconnectedHost];
-            [alert runModal];
+            if (self.isDebug)
+            {
+                NSAlert *alert = [NSAlert alertWithMessageText:@"Client Disconnected"
+                                                 defaultButton:@"OK"
+                                               alternateButton:nil
+                                                   otherButton:nil
+                                     informativeTextWithFormat:@"%@ has disconnected.", disconnectedHost];
+                [alert runModal];
+            }
         }
     }
 }
@@ -373,6 +383,7 @@ typedef void (^ConnectionCompletionBlock)(void);
 
 - (void)parserDidStartDocument:(NSXMLParser *)parser
 {
+    NSLog(@"START XML");
     //the parser started this document. what are you going to do?
     _apps = [NSMutableArray new];
     _clientAddresses = [NSMutableArray new];
@@ -403,6 +414,18 @@ typedef void (^ConnectionCompletionBlock)(void);
     [self updateViewForApps];
 }
 
+- (void)parser:(NSXMLParser *)parser parseErrorOccurred:(NSError *)parseError
+{
+    NSLog(@"XML Parse Error: %@", parseError);
+    NSString *errorMessage = [parseError userInfo][@"NSXMLParserErrorMessage"];
+    NSAlert *alert = [NSAlert alertWithMessageText:@"Schedule Error"
+                                     defaultButton:@"OK"
+                                   alternateButton:nil
+                                       otherButton:nil
+                         informativeTextWithFormat:@"%@", errorMessage];
+    [alert runModal];
+}
+
 BOOL XMLToBOOL(NSString *xmlValue)
 {
     NSString *lcv = [[xmlValue lowercaseString]
@@ -418,9 +441,21 @@ BOOL XMLToBOOL(NSString *xmlValue)
     {
         _lastApp.durationSeconds = @([value integerValue]);
     }
+    else if ([_xmlElementName isEqualToString:kXMLElementLaunchUrl])
+    {
+        _lastApp.webURL = value;
+        _lastApp.type = AppLaunchTypeWebURL;
+    }
+    else if ([_xmlElementName isEqualToString:kXMLElementLaunchCommand])
+    {
+        // TODO: Make this launch path relative to the known paths
+        _lastApp.command = value;
+        _lastApp.type = AppLaunchTypeCommand;
+    }
     else if ([_xmlElementName isEqualToString:kXMLElementLaunchPath])
     {
         _lastApp.path = value;
+        _lastApp.type = AppLaunchTypeAppPath;
     }
     else if ([_xmlElementName isEqualToString:kXMLElementKillName])
     {
@@ -437,6 +472,14 @@ BOOL XMLToBOOL(NSString *xmlValue)
     else if ([_xmlElementName isEqualToString:kXMLElementAutoAdvance])
     {
         self.shouldAutoAdvance = XMLToBOOL(value);
+    }
+    else if ([_xmlElementName isEqualToString:kXMLElementSleepBetweenApps])
+    {
+        self.timeSleepBetweenLaunches = [value floatValue];
+    }
+    else if ([_xmlElementName isEqualToString:kXMLElementDebug])
+    {
+        self.isDebug = XMLToBOOL(value);
     }
     else if ([_xmlElementName isEqualToString:kXMLElementClientIP])
     {
@@ -488,19 +531,34 @@ BOOL XMLToBOOL(NSString *xmlValue)
         
         self.numAppsLaunched = 0;
         
-        NSString *message = [NSString stringWithFormat:@"%@%@%@%@%@%@%@",
+        NSString *value;
+        if (app.type == AppLaunchTypeCommand)
+        {
+            value = app.command;
+        }
+        else if (app.type == AppLaunchTypeWebURL)
+        {
+            value = app.webURL;
+        }
+        else if (app.type == AppLaunchTypeAppPath)
+        {
+            value = app.path;
+        }
+        NSString *message = [NSString stringWithFormat:@"%@%@%@%@%@%@%i%@%@",
                              kCommandLaunchApp,
                              kCommandParamDelim,
                              app.killName,
                              kCommandParamDelim,
-                             app.path,
+                             value,
+                             kCommandParamDelim,
+                             app.type,
                              kCommandParamDelim,
                              app.wallpaperPath];
+        
         for (NSString *hostName in self.sockets)
         {
             [self sendMessage:message toSocket:self.sockets[hostName]];
         }
-    
     }];
 }
 
@@ -542,24 +600,32 @@ BOOL XMLToBOOL(NSString *xmlValue)
     NSTimeInterval delta = ti - _timeAppLaunched;
     ITPApp *currentApp = _apps[_currentAppIndex];
     int secondsAppDuration = [currentApp.durationSeconds intValue];
-    int secondsAppRemain = secondsAppDuration - (int)delta;
-
-    int minutes = secondsAppRemain / 60;
-    int seconds = secondsAppRemain % 60;
-    int hours = minutes / 60;
-    minutes = minutes % 60;
-    if (hours > 0)
+    if (secondsAppDuration > 0)
     {
-        self.currentTimeRemaining = [NSString stringWithFormat:@"%i:%02i:%02i", hours, minutes, seconds];
+        int secondsAppRemain = secondsAppDuration - (int)delta;
+
+        int minutes = secondsAppRemain / 60;
+        int seconds = secondsAppRemain % 60;
+        int hours = minutes / 60;
+        minutes = minutes % 60;
+        if (hours > 0)
+        {
+            self.currentTimeRemaining = [NSString stringWithFormat:@"%i:%02i:%02i", hours, minutes, seconds];
+        }
+        else
+        {
+            self.currentTimeRemaining = [NSString stringWithFormat:@"%02i:%02i", minutes, seconds];
+        }
+        
+        if (secondsAppRemain <= 0)
+        {
+            [self killApp:currentApp];
+        }
     }
     else
     {
-        self.currentTimeRemaining = [NSString stringWithFormat:@"%02i:%02i", minutes, seconds];
-    }
-    
-    if (secondsAppRemain <= 0)
-    {
-        [self killApp:currentApp];
+        // The duration is 0. Never force quit.
+        self.currentTimeRemaining = @"∞";
     }
 }
 
@@ -605,7 +671,15 @@ BOOL XMLToBOOL(NSString *xmlValue)
     else if ([aTableColumn.identifier isEqualToString:@"path"])
     {
         // 2 == Path
-        return app.path;
+        switch (app.type)
+        {
+            case AppLaunchTypeAppPath:
+                return app.path;
+            case AppLaunchTypeWebURL:
+                return app.webURL;
+            case AppLaunchTypeCommand:
+                return app.command;
+        }
     }
     return @"?";
 }
