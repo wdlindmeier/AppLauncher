@@ -69,9 +69,18 @@ http://www.youtube.com/watch?v=Z4A6BD6035w
       <!-- 	launch-path:
       		The absolute path to the application.  
       		This must be the same on all machines. 
-      		Required.
+          
+          	launch-url:
+          	A URL to your content. Will be opened in Chrome (full screen).
+          
+          	launch-command:
+          	A command-line script to execute (e.g. AppleScript).
+          
+      		One of the above is required.
       -->
       <launch-path>/AppLauncher/apps/SillyApp0.app</launch-path>
+      <launch-url>https://www.shadertoy.com/view/XslGRr</launch-url>
+      <launch-command>/usr/bin/osascript /AppLauncher/scripts/launchApp.scpt</launch-command>
       
       <!-- 	kill-name:
       		The app "kill name". This is used as a unique identifier and 
