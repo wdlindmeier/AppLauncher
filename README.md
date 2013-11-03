@@ -76,7 +76,7 @@ http://www.youtube.com/watch?v=Z4A6BD6035w
           	launch-command:
           	A command-line script to execute (e.g. AppleScript).
           
-      		One of the above is required.
+      		One of the above is required. Only one will be launched.
       -->
       <launch-path>/AppLauncher/apps/SillyApp0.app</launch-path>
       <launch-url>https://www.shadertoy.com/view/XslGRr</launch-url>
