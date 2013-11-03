@@ -124,7 +124,7 @@ http://www.youtube.com/watch?v=Z4A6BD6035w
 * **AppLauncherClient/**: The code for the client application. Launches apps locally on each machine. 
 * **SillyApp/**: Sample apps to start and stop.
 * **apps/**: Builds of the above applications (for OS X).
-* **data/**: .schedule files, which is what the AppLauncher reads.
 * **misc/**: ...
+* **schedules/**: .schedule files, which is what the AppLauncher reads.
 * **wallpapers/**: Background images displayed by the client behind the launched app.
 * **README.md**: This file.
