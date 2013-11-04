@@ -1,0 +1,27 @@
+<schedule>
+  <loop>false</loop>
+  <debug>true</debug>
+  <duration-interlude-seconds>3.0</duration-interlude-seconds>
+  <auto-advance>true</auto-advance>
+  <machines>
+    <client-ip>127.0.0.1</client-ip>
+  </machines>
+  <apps>
+    <app>
+      <duration-seconds>10</duration-seconds>
+      <!-- An example of launch-video. Opens a video with Quicktime in full screen. 
+           Seems to be picky about the filetype. Works with .mov files.
+      -->
+      <launch-video>/Users/bill/Documents/ITP/BIG-AppLauncher/two.mov</launch-video>
+      <wallpaper-path>/Users/bill/Documents/ITP/BIG-AppLauncher/repo/wallpapers/wallpaper_1.jpg</wallpaper-path>
+      <kill-name>QuickTime Player</kill-name>
+    </app>
+    <app>
+      <duration-seconds>10</duration-seconds>
+      <!-- An example of launch-command using the VLC player. -->
+      <launch-command>/Applications/VLC.app/Contents/MacOS/VLC --fullscreen /Users/bill/Documents/ITP/BIG-AppLauncher/one.mp4 </launch-command>
+      <wallpaper-path>/Users/bill/Documents/ITP/BIG-AppLauncher/repo/wallpapers/wallpaper_1.jpg</wallpaper-path>
+      <kill-name>VLC</kill-name>
+    </app>
+  </apps>
+</schedule>

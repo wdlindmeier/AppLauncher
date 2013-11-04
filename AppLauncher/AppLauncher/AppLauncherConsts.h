@@ -10,9 +10,10 @@
 
 static NSString * const kXMLElementApp = @"app";
 static NSString * const kXMLElementDurationSeconds = @"duration-seconds";
-static NSString * const kXMLElementLaunchPath = @"launch-path";
+static NSString * const kXMLElementLaunchApp = @"launch-app";
 static NSString * const kXMLElementLaunchUrl = @"launch-url";
 static NSString * const kXMLElementLaunchCommand = @"launch-command";
+static NSString * const kXMLElementLaunchVideo = @"launch-video";
 static NSString * const kXMLElementKillName = @"kill-name";
 static NSString * const kXMLElementWallpaperPath = @"wallpaper-path";
 static NSString * const kXMLElementShouldLoop = @"loop";

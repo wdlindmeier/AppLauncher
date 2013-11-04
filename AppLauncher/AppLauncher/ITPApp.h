@@ -12,7 +12,8 @@ typedef enum AppLaunchTypes
 {
     AppLaunchTypeAppPath = 0,
     AppLaunchTypeWebURL = 1,
-    AppLaunchTypeCommand = 2
+    AppLaunchTypeCommand = 2,
+    AppLaunchTypeVideo = 3
     
 } AppLaunchType;
 

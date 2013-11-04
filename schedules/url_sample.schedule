@@ -8,17 +8,17 @@
   </machines>
   <apps>
     <app>
+      <duration-seconds>5</duration-seconds>
+      <!-- An example of launch-command. Fires a custom apple script. -->
+      <launch-command>/usr/bin/osascript /Users/bill/Documents/ITP/BIG-AppLauncher/openChromeURL.scpt http://wired.com</launch-command>
+      <wallpaper-path>/Users/bill/Documents/ITP/BIG-AppLauncher/repo/wallpapers/wallpaper_1.jpg</wallpaper-path>
+      <kill-name>Google Chrome</kill-name>
+    </app>
+    <app>
       <duration-seconds>0</duration-seconds>
       <!-- An example of launch-url. Opens in borderless Google Chrome. -->
       <launch-url>http://google.org</launch-url>
       <wallpaper-path>/Users/bill/Documents/ITP/BIG-AppLauncher/repo/wallpapers/wallpaper_0.jpeg</wallpaper-path>
-      <kill-name>Google Chrome</kill-name>
-    </app>
-    <app>
-      <duration-seconds>5</duration-seconds>
-      <!-- An example of launch-command. Fires a custom apple script. -->
-      <launch-command>/usr/bin/osascript /Users/bill/Desktop/openChromeURL.scpt http://wired.com</launch-command>
-      <wallpaper-path>/Users/bill/Documents/ITP/BIG-AppLauncher/repo/wallpapers/wallpaper_1.jpg</wallpaper-path>
       <kill-name>Google Chrome</kill-name>
     </app>
   </apps>

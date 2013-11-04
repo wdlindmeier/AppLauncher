@@ -452,10 +452,15 @@ BOOL XMLToBOOL(NSString *xmlValue)
         _lastApp.command = value;
         _lastApp.type = AppLaunchTypeCommand;
     }
-    else if ([_xmlElementName isEqualToString:kXMLElementLaunchPath])
+    else if ([_xmlElementName isEqualToString:kXMLElementLaunchApp])
     {
         _lastApp.path = value;
         _lastApp.type = AppLaunchTypeAppPath;
+    }
+    else if ([_xmlElementName isEqualToString:kXMLElementLaunchVideo])
+    {
+        _lastApp.path = value;
+        _lastApp.type = AppLaunchTypeVideo;
     }
     else if ([_xmlElementName isEqualToString:kXMLElementKillName])
     {
@@ -541,6 +546,10 @@ BOOL XMLToBOOL(NSString *xmlValue)
             value = app.webURL;
         }
         else if (app.type == AppLaunchTypeAppPath)
+        {
+            value = app.path;
+        }
+        else if (app.type == AppLaunchTypeVideo)
         {
             value = app.path;
         }
@@ -674,6 +683,8 @@ BOOL XMLToBOOL(NSString *xmlValue)
         switch (app.type)
         {
             case AppLaunchTypeAppPath:
+                return app.path;
+            case AppLaunchTypeVideo:
                 return app.path;
             case AppLaunchTypeWebURL:
                 return app.webURL;

@@ -105,6 +105,10 @@
                 {
                     app.path = tokens[2];
                 }
+                else if (app.type == AppLaunchTypeVideo)
+                {
+                    app.path = tokens[2];
+                }
             }
             else
             {
@@ -184,6 +188,17 @@
     {
         NSLog(@"Launching app: %@", app.path);
         [task setLaunchPath:@"/usr/bin/open"];
+        [task setArguments:@[app.path]];
+        grepName = app.path;
+    }
+    else if (app.type == AppLaunchTypeVideo)
+    {
+        NSLog(@"Launching video: %@", app.path);
+        NSString *commandPath = [[NSBundle mainBundle] pathForResource:@"Application Stub"
+                                                                ofType:nil
+                                                           inDirectory:@"PlayMovie.app/Contents/MacOS"];
+        NSLog(@"commandPath: %@", commandPath);
+        [task setLaunchPath:commandPath];
         [task setArguments:@[app.path]];
         grepName = app.path;
     }
