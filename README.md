@@ -5,8 +5,8 @@ AppLauncher
 An application that launches other applications on remote machines.  
 Launches can be times, looped and automatically advanced on an arbitrary number of machines.
 
-[Video](http://www.youtube.com/watch?v=Z4A6BD6035w):  
-http://www.youtube.com/watch?v=Z4A6BD6035w
+[Video: Multi-screen](http://www.youtube.com/watch?v=Z4A6BD6035w)  
+[Video: Various launch types](http://youtu.be/hgu0jd0R4i0)
 
 ![image](https://raw.github.com/wdlindmeier/AppLauncher/master/misc/launcher_screenshot.png)
 
@@ -71,10 +71,12 @@ http://www.youtube.com/watch?v=Z4A6BD6035w
       		This must be the same on all machines. 
           
           	launch-url:
-          	A URL to your content. Will be opened in Chrome (full screen).
+          	A URL to your content. 
+          	Will be opened in a full screen Chrome window.
 
           	launch-video:
           	An absolute path to a video that can be played by QuickTime.
+          	Will be presented in a full screen QuickTime window.
           
           	launch-command:
           	A command-line script to execute (e.g. AppleScript).
