@@ -15,7 +15,7 @@ http://www.youtube.com/watch?v=Z4A6BD6035w
 
 2) Open apps/AppLauncherClient on all of the client machines. This app coordinates with the Launcher to start and stop local processes. The client opens in full-screen mode, but this can be toggled by pressing 'f'.  
 
-3) Open AppLauncher on the controller machine. When it boots, you'll be asked to select a .schedule file. You can find a sample in the "data" folder. This is the format to create your own:  
+3) Open AppLauncher on the controller machine. When it boots, you'll be asked to select a .schedule file. You can find a sample in the "schedules" folder. This is the format to create your own:  
 
 ```xml
 <schedule>
@@ -72,6 +72,9 @@ http://www.youtube.com/watch?v=Z4A6BD6035w
           
           	launch-url:
           	A URL to your content. Will be opened in Chrome (full screen).
+
+          	launch-video:
+          	An absolute path to a video that can be played by QuickTime.
           
           	launch-command:
           	A command-line script to execute (e.g. AppleScript).
@@ -80,6 +83,7 @@ http://www.youtube.com/watch?v=Z4A6BD6035w
       -->
       <launch-path>/AppLauncher/apps/SillyApp0.app</launch-path>
       <launch-url>https://www.shadertoy.com/view/XslGRr</launch-url>
+      <launch-video>/AppLauncher/apps/FullScreenMovie.mov</launch-video>
       <launch-command>/usr/bin/osascript /AppLauncher/scripts/launchApp.scpt</launch-command>
       
       <!-- 	kill-name:
@@ -118,6 +122,10 @@ http://www.youtube.com/watch?v=Z4A6BD6035w
 ```
 4) Press the Start button to begin the schedule. The schedule will begin on whatever app is selected in the table view.
 
+###Important Notes
+
+When an app (or video, url, etc.) has timed out, AppLauncher will **force quit** the application. This means all windows will close and any work-in-progress will be unsaved. 
+
 ###Contents
 
 * **AppLauncher/**: The code for the controller application. Starts and stops apps on all machines.
@@ -125,6 +133,6 @@ http://www.youtube.com/watch?v=Z4A6BD6035w
 * **SillyApp/**: Sample apps to start and stop.
 * **apps/**: Builds of the above applications (for OS X).
 * **misc/**: ...
-* **schedules/**: .schedule files, which is what the AppLauncher reads.
+* **schedules/**: Some sample .schedule files, which is what the AppLauncher reads.
 * **wallpapers/**: Background images displayed by the client behind the launched app.
 * **README.md**: This file.
