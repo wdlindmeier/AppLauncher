@@ -1,3 +1,7 @@
+<!-- 
+  A sample schedule that launches 4 simple apps with various wallpapers.  
+  NOTE: All launch paths and IP addressed must be updated for your machine.
+-->
 <schedule>
   <loop>false</loop>
   <auto-advance>true</auto-advance>
@@ -11,25 +15,25 @@
   <apps>
     <app>
       <duration-seconds>10</duration-seconds>
-      <launch-path>/Users/bigscreens/Documents/launcher/apps/SillyApp0.app</launch-path>
+      <launch-app>/Users/bigscreens/Documents/launcher/apps/SillyApp0.app</launch-app>
       <wallpaper-path>/Users/bigscreens/Documents/launcher/wallpapers/wallpaper_0.jpeg</wallpaper-path>
       <kill-name>SillyApp0</kill-name>
     </app>
     <app>
       <duration-seconds>5</duration-seconds>
-      <launch-path>/Users/bigscreens/Documents/launcher/apps/SillyApp1.app</launch-path>
+      <launch-app>/Users/bigscreens/Documents/launcher/apps/SillyApp1.app</launch-app>
       <wallpaper-path>/Users/bigscreens/Documents/launcher/wallpapers/wallpaper_1.jpg</wallpaper-path>
       <kill-name>SillyApp1</kill-name>
     </app>
     <app>
       <duration-seconds>10</duration-seconds>
-      <launch-path>/Users/bigscreens/Documents/launcher/apps/SillyApp2.app</launch-path>
+      <launch-app>/Users/bigscreens/Documents/launcher/apps/SillyApp2.app</launch-app>
       <wallpaper-path>/Users/bigscreens/Documents/launcher/wallpapers/wallpaper_2.png</wallpaper-path>
       <kill-name>SillyApp2</kill-name>
     </app>
     <app>
       <duration-seconds>3</duration-seconds>
-      <launch-path>/Users/bigscreens/Documents/launcher/apps/SillyApp3.app</launch-path>
+      <launch-app>/Users/bigscreens/Documents/launcher/apps/SillyApp3.app</launch-app>
       <wallpaper-path>/Users/bigscreens/Documents/launcher/wallpapers/wallpaper_3.jpg</wallpaper-path>
       <kill-name>SillyApp3</kill-name>
     </app>

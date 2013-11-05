@@ -60,9 +60,8 @@ typedef void (^ConnectionCompletionBlock)(void);
     [super windowControllerDidLoadNib:aController];
     // Add any code here that needs to be executed once the windowController has loaded the document's window.
 
-    // TODO: Load from settings
-    self.shouldLoop = NO;
-    self.shouldAutoAdvance = YES;
+    // self.shouldLoop = NO;
+    // self.shouldAutoAdvance = YES;
     
     self.currentAppName = @"None";
     self.currentTimeRemaining = @"--";

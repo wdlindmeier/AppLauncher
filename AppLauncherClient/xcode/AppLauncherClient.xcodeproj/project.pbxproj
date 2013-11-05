@@ -21,7 +21,7 @@
 		A903A07917F66DDB00C28835 /* ITPApp.m in Sources */ = {isa = PBXBuildFile; fileRef = A903A07817F66DDB00C28835 /* ITPApp.m */; };
 		A903A08C17F67CE100C28835 /* app_grep in Resources */ = {isa = PBXBuildFile; fileRef = A903A08B17F67CE100C28835 /* app_grep */; };
 		A9B50B2C1824959300C077BD /* openChromeURL.scpt in Resources */ = {isa = PBXBuildFile; fileRef = A9B50B2B1824959300C077BD /* openChromeURL.scpt */; };
-		A9B8332818274E2F00724511 /* PlayMovie.app in Resources */ = {isa = PBXBuildFile; fileRef = A9B8332718274E2F00724511 /* PlayMovie.app */; };
+		A9CF4D0718282B77000A350A /* openVideo.scpt in Resources */ = {isa = PBXBuildFile; fileRef = A9CF4D0618282B77000A350A /* openVideo.scpt */; };
 		A9D8A6AC17FC5F030080A0EE /* ConnectionManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = A9D8A6AB17FC5F030080A0EE /* ConnectionManager.mm */; };
 		FDC12845666A413982CB09A3 /* CinderApp.icns in Resources */ = {isa = PBXBuildFile; fileRef = EF90EBA90F5245C3A51E72D3 /* CinderApp.icns */; };
 /* End PBXBuildFile section */
@@ -48,7 +48,7 @@
 		A903A07817F66DDB00C28835 /* ITPApp.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ITPApp.m; path = ../../AppLauncher/AppLauncher/ITPApp.m; sourceTree = "<group>"; };
 		A903A08B17F67CE100C28835 /* app_grep */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = app_grep; sourceTree = "<group>"; };
 		A9B50B2B1824959300C077BD /* openChromeURL.scpt */ = {isa = PBXFileReference; lastKnownFileType = file; path = openChromeURL.scpt; sourceTree = "<group>"; };
-		A9B8332718274E2F00724511 /* PlayMovie.app */ = {isa = PBXFileReference; lastKnownFileType = wrapper.application; path = PlayMovie.app; sourceTree = "<group>"; };
+		A9CF4D0618282B77000A350A /* openVideo.scpt */ = {isa = PBXFileReference; lastKnownFileType = file; path = openVideo.scpt; sourceTree = "<group>"; };
 		A9D8A6AB17FC5F030080A0EE /* ConnectionManager.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ConnectionManager.mm; path = ../src/ConnectionManager.mm; sourceTree = "<group>"; };
 		A9D8A6AD17FC5F150080A0EE /* ConnectionManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ConnectionManager.h; path = ../include/ConnectionManager.h; sourceTree = "<group>"; };
 		A9D8A6B117FC679B0080A0EE /* DisplayApp.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = DisplayApp.hpp; path = ../include/DisplayApp.hpp; sourceTree = "<group>"; };
@@ -177,7 +177,7 @@
 		A903A08A17F67CE100C28835 /* scripts */ = {
 			isa = PBXGroup;
 			children = (
-				A9B8332718274E2F00724511 /* PlayMovie.app */,
+				A9CF4D0618282B77000A350A /* openVideo.scpt */,
 				A9B50B2B1824959300C077BD /* openChromeURL.scpt */,
 				A903A08B17F67CE100C28835 /* app_grep */,
 			);
@@ -239,8 +239,8 @@
 			files = (
 				A9B50B2C1824959300C077BD /* openChromeURL.scpt in Resources */,
 				A903A08C17F67CE100C28835 /* app_grep in Resources */,
-				A9B8332818274E2F00724511 /* PlayMovie.app in Resources */,
 				FDC12845666A413982CB09A3 /* CinderApp.icns in Resources */,
+				A9CF4D0718282B77000A350A /* openVideo.scpt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

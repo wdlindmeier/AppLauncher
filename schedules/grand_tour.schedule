@@ -1,10 +1,10 @@
 <!-- 
-  A sample schedule that shows 2 ways of launching video (QuickTime and VLC).
+  A sample schedule that uses every launch type. 
   Localhost only.
   NOTE: All launch paths and IP addressed must be updated for your machine.
 -->
 <schedule>
-  <loop>false</loop>
+  <loop>true</loop>
   <debug>true</debug>
   <duration-interlude-seconds>3.0</duration-interlude-seconds>
   <auto-advance>true</auto-advance>
@@ -12,18 +12,30 @@
     <client-ip>127.0.0.1</client-ip>
   </machines>
   <apps>
+    <!-- Launch App -->
     <app>
-      <duration-seconds>10</duration-seconds>
-      <!-- An example of launch-video. Opens a video with Quicktime in full screen. 
-           Seems to be picky about the filetype. Works with .mov files.
-      -->
+      <duration-seconds>8</duration-seconds>
+      <launch-app>/Users/bill/Documents/ITP/BIG-AppLauncher/repo/apps/SillyApp1.app</launch-app>
+      <wallpaper-path>/Users/bill/Documents/ITP/BIG-AppLauncher/repo/wallpapers/wallpaper_1.jpg</wallpaper-path>
+      <kill-name>SillyApp1</kill-name>
+    </app>  
+    <!-- Launch Video -->
+    <app>
+      <duration-seconds>8</duration-seconds>
       <launch-video>/Users/bill/Documents/ITP/BIG-AppLauncher/two.mov</launch-video>
       <wallpaper-path>/Users/bill/Documents/ITP/BIG-AppLauncher/repo/wallpapers/wallpaper_1.jpg</wallpaper-path>
       <kill-name>QuickTime Player</kill-name>
     </app>
+    <!-- Launch URL -->
     <app>
-      <duration-seconds>5</duration-seconds>
-      <!-- An example of launch-command using the VLC player. -->
+      <duration-seconds>8</duration-seconds>
+      <launch-url>http://google.org</launch-url>
+      <wallpaper-path>/Users/bill/Documents/ITP/BIG-AppLauncher/repo/wallpapers/wallpaper_1.jpg</wallpaper-path>
+      <kill-name>Google Chrome</kill-name>
+    </app>
+    <!-- Launch Command -->
+    <app>
+      <duration-seconds>8</duration-seconds>
       <launch-command>/usr/bin/open -a VLC -F /Users/bill/Documents/ITP/BIG-AppLauncher/one.mp4 --args --fullscreen</launch-command>   
       <wallpaper-path>/Users/bill/Documents/ITP/BIG-AppLauncher/repo/wallpapers/wallpaper_1.jpg</wallpaper-path>
       <kill-name>VLC</kill-name>

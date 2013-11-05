@@ -172,7 +172,9 @@
         grepName = launchPath;
         if (commandComponents.count > 1)
         {
-            [task setArguments:[commandComponents subarrayWithRange:NSMakeRange(1, commandComponents.count - 1)]];
+            NSArray *otherArgs = [commandComponents subarrayWithRange:NSMakeRange(1, commandComponents.count - 1)];
+            //[task setArguments:@[[otherArgs componentsJoinedByString:@" "]]];
+            [task setArguments:otherArgs];
         }
     }
     else if (app.type == AppLaunchTypeWebURL)
@@ -188,19 +190,19 @@
     {
         NSLog(@"Launching app: %@", app.path);
         [task setLaunchPath:@"/usr/bin/open"];
-        [task setArguments:@[app.path]];
+        
+        // -F: Asks to open the app "Fresh"
+        [task setArguments:@[@"-F", app.path]];
         grepName = app.path;
     }
     else if (app.type == AppLaunchTypeVideo)
     {
         NSLog(@"Launching video: %@", app.path);
-        NSString *commandPath = [[NSBundle mainBundle] pathForResource:@"Application Stub"
-                                                                ofType:nil
-                                                           inDirectory:@"PlayMovie.app/Contents/MacOS"];
-        NSLog(@"commandPath: %@", commandPath);
+        NSString *commandPath = @"/usr/bin/osascript"; // Apple script
+        NSString *scriptPath = [[NSBundle mainBundle] pathForResource:@"openVideo" ofType:@"scpt"];
         [task setLaunchPath:commandPath];
-        [task setArguments:@[app.path]];
-        grepName = app.path;
+        [task setArguments:@[scriptPath, app.path]];
+        grepName = @"QuickTime Player";
     }
     
     if (app.wallpaperPath)
@@ -344,13 +346,13 @@
         isKillingWithPID = true;
         NSLog(@"Attempting to kill pid: >>%@<<", app.pid);
         scriptPath = @"/bin/kill";
-        [task setArguments: @[[app.pid stringValue]]];
+        [task setArguments: @[@"-9", [app.pid stringValue]]];
     }
     else
     {
         NSLog(@"Attempting to kill app named: >>%@<<", app.killName);
         scriptPath = @"/usr/bin/pkill";
-        [task setArguments: @[app.killName]];
+        [task setArguments: @[@"-9", app.killName]];
     }
     
     [task setLaunchPath: scriptPath];

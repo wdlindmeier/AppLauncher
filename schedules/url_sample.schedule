@@ -1,3 +1,8 @@
+<!-- 
+  A sample schedule that shows two ways of launching URLs (both in Chrome).
+  Localhost only.
+  NOTE: All launch paths and IP addressed must be updated for your machine.
+-->
 <schedule>
   <loop>false</loop>
   <debug>true</debug>
@@ -15,7 +20,7 @@
       <kill-name>Google Chrome</kill-name>
     </app>
     <app>
-      <duration-seconds>0</duration-seconds>
+      <duration-seconds>5</duration-seconds>
       <!-- An example of launch-url. Opens in borderless Google Chrome. -->
       <launch-url>http://google.org</launch-url>
       <wallpaper-path>/Users/bill/Documents/ITP/BIG-AppLauncher/repo/wallpapers/wallpaper_0.jpeg</wallpaper-path>
