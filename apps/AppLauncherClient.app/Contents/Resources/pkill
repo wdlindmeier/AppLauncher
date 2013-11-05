@@ -1,4 +1,0 @@
-#!/bin/sh
-# $1 is the app name (as seen in `top` or `ps`
-
-pkill $1

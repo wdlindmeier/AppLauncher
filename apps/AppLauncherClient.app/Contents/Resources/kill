@@ -1,4 +1,0 @@
-#!/bin/sh
-# $1 is the app pid (process id)
-
-kill $1
