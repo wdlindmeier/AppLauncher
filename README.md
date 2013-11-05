@@ -5,6 +5,8 @@ AppLauncher
 An application that launches other applications on remote machines.  
 Launches can be times, looped and automatically advanced on an arbitrary number of machines.
 
+Originaly developed for the [Big Screens](http://itp.nyu.edu/bigscreens/) course at ITP/NYU.
+
 [Video: Multi-screen](http://www.youtube.com/watch?v=Z4A6BD6035w)  
 [Video: Various launch types](http://youtu.be/hgu0jd0R4i0)
 
