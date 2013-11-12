@@ -21,6 +21,7 @@
 		A903A07917F66DDB00C28835 /* ITPApp.m in Sources */ = {isa = PBXBuildFile; fileRef = A903A07817F66DDB00C28835 /* ITPApp.m */; };
 		A903A08C17F67CE100C28835 /* app_grep in Resources */ = {isa = PBXBuildFile; fileRef = A903A08B17F67CE100C28835 /* app_grep */; };
 		A9B50B2C1824959300C077BD /* openChromeURL.scpt in Resources */ = {isa = PBXBuildFile; fileRef = A9B50B2B1824959300C077BD /* openChromeURL.scpt */; };
+		A9C3E3501831DB14003C3DA5 /* ITPClientLaunch.m in Sources */ = {isa = PBXBuildFile; fileRef = A9C3E34F1831DB14003C3DA5 /* ITPClientLaunch.m */; };
 		A9CF4D0718282B77000A350A /* openVideo.scpt in Resources */ = {isa = PBXBuildFile; fileRef = A9CF4D0618282B77000A350A /* openVideo.scpt */; };
 		A9D8A6AC17FC5F030080A0EE /* ConnectionManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = A9D8A6AB17FC5F030080A0EE /* ConnectionManager.mm */; };
 		FDC12845666A413982CB09A3 /* CinderApp.icns in Resources */ = {isa = PBXBuildFile; fileRef = EF90EBA90F5245C3A51E72D3 /* CinderApp.icns */; };
@@ -48,6 +49,8 @@
 		A903A07817F66DDB00C28835 /* ITPApp.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ITPApp.m; path = ../../AppLauncher/AppLauncher/ITPApp.m; sourceTree = "<group>"; };
 		A903A08B17F67CE100C28835 /* app_grep */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = app_grep; sourceTree = "<group>"; };
 		A9B50B2B1824959300C077BD /* openChromeURL.scpt */ = {isa = PBXFileReference; lastKnownFileType = file; path = openChromeURL.scpt; sourceTree = "<group>"; };
+		A9C3E34E1831DB14003C3DA5 /* ITPClientLaunch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ITPClientLaunch.h; path = ../../AppLauncher/AppLauncher/ITPClientLaunch.h; sourceTree = "<group>"; };
+		A9C3E34F1831DB14003C3DA5 /* ITPClientLaunch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ITPClientLaunch.m; path = ../../AppLauncher/AppLauncher/ITPClientLaunch.m; sourceTree = "<group>"; };
 		A9CF4D0618282B77000A350A /* openVideo.scpt */ = {isa = PBXFileReference; lastKnownFileType = file; path = openVideo.scpt; sourceTree = "<group>"; };
 		A9D8A6AB17FC5F030080A0EE /* ConnectionManager.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ConnectionManager.mm; path = ../src/ConnectionManager.mm; sourceTree = "<group>"; };
 		A9D8A6AD17FC5F150080A0EE /* ConnectionManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ConnectionManager.h; path = ../include/ConnectionManager.h; sourceTree = "<group>"; };
@@ -83,6 +86,8 @@
 				46E8D23CE9834B438C15957B /* AppLauncherClientApp.mm */,
 				A9D8A6AB17FC5F030080A0EE /* ConnectionManager.mm */,
 				A903A07817F66DDB00C28835 /* ITPApp.m */,
+				A9C3E34E1831DB14003C3DA5 /* ITPClientLaunch.h */,
+				A9C3E34F1831DB14003C3DA5 /* ITPClientLaunch.m */,
 			);
 			name = Source;
 			sourceTree = "<group>";
@@ -251,6 +256,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A9C3E3501831DB14003C3DA5 /* ITPClientLaunch.m in Sources */,
 				A903A06B17F63F9200C28835 /* GCDAsyncSocket.m in Sources */,
 				A9D8A6AC17FC5F030080A0EE /* ConnectionManager.mm in Sources */,
 				510CB7F55A774FA0A28DA3ED /* AppLauncherClientApp.mm in Sources */,

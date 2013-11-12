@@ -8,13 +8,13 @@
 
 #import "ConnectionManager.h"
 #include "GCDAsyncSocket.h"
-#include "ITPApp.h"
+#include "ITPClientLaunch.h"
 #include "DisplayApp.hpp"
 
 @implementation ConnectionManager
 {
     GCDAsyncSocket *_serverSocket;
-    NSMutableDictionary *_apps;
+    NSMutableDictionary *_launches;
     dispatch_queue_t _socketQueue;
     DisplayApp *_displayApp;
 }
@@ -24,7 +24,7 @@
     self = [super init];
     if (self)
     {
-        _apps = [NSMutableDictionary dictionary];
+        _launches = [NSMutableDictionary dictionary];
         _socketQueue = dispatch_queue_create("socketQueue", NULL);
         _serverSocket = nil;
         _displayApp = cinderApp;
@@ -70,16 +70,16 @@
     {
         NSString *command = tokens[0];
         
-        ITPApp *app = nil;
+        ITPClientLaunch *launch = nil;
         if (tokens.count > 1)
         {
-            NSString *appKillName = tokens[1];
-            app = _apps[appKillName];
-            if (!app)
+            NSString *launchKillName = tokens[1];
+            launch = _launches[launchKillName];
+            if (!launch)
             {
-                app = [ITPApp new];
-                app.killName = appKillName;
-                _apps[appKillName] = app;
+                launch = [ITPClientLaunch new];
+                launch.killName = launchKillName;
+                _launches[launchKillName] = launch;
             }
         }
         else
@@ -92,22 +92,22 @@
         {
             if (tokens.count > 3)
             {
-                app.type = (AppLaunchType)[(NSString *)tokens[3] intValue];
-                if (app.type == AppLaunchTypeCommand)
+                launch.type = (AppLaunchType)[(NSString *)tokens[3] intValue];
+                if (launch.type == AppLaunchTypeCommand)
                 {
-                    app.command = tokens[2];
+                    launch.command = tokens[2];
                 }
-                else if (app.type == AppLaunchTypeWebURL)
+                else if (launch.type == AppLaunchTypeWebURL)
                 {
-                    app.webURL = tokens[2];
+                    launch.webURL = tokens[2];
                 }
-                else if (app.type == AppLaunchTypeAppPath)
+                else if (launch.type == AppLaunchTypeAppPath)
                 {
-                    app.path = tokens[2];
+                    launch.path = tokens[2];
                 }
-                else if (app.type == AppLaunchTypeVideo)
+                else if (launch.type == AppLaunchTypeVideo)
                 {
-                    app.path = tokens[2];
+                    launch.path = tokens[2];
                 }
             }
             else
@@ -118,19 +118,20 @@
 
             if (tokens.count > 4)
             {
-                app.wallpaperPath = tokens[4];
+                launch.wallpaperPath = tokens[4];
             }
             else
             {
-                app.wallpaperPath = nil;
+                launch.wallpaperPath = nil;
             }
 
-            [self launchApp:app];
+            [self launchApp:launch];
 
         }
         
         else if ([command isEqualToString:@"KILL"])
         {
+            /*
             if (tokens.count > 2)
             {
                 int pid = [(NSString *)tokens[2] intValue];
@@ -139,8 +140,8 @@
                     app.pid = @(pid);
                 }
             }
-            
-            [self killApp:app];
+            */
+            [self killApp:launch];
         }
     }
     
@@ -157,16 +158,16 @@
     [newSocket readDataWithTimeout:-1 tag:0];
 }
 
-- (void)launchApp:(ITPApp *)app
+- (void)launchApp:(ITPClientLaunch *)launch
 {
-    NSString *killName = app.killName;
+    NSString *killName = launch.killName;
     
     NSTask *task = [[NSTask alloc] init];
     NSString *grepName = nil;
-    if (app.type == AppLaunchTypeCommand)
+    if (launch.type == AppLaunchTypeCommand)
     {
-        NSLog(@"Launching command: %@", app.command);
-        NSArray *commandComponents = [app.command componentsSeparatedByString:@" "];
+        NSLog(@"Launching command: %@", launch.command);
+        NSArray *commandComponents = [launch.command componentsSeparatedByString:@" "];
         NSString *launchPath = commandComponents[0];
         [task setLaunchPath:launchPath];
         grepName = launchPath;
@@ -177,37 +178,37 @@
             [task setArguments:otherArgs];
         }
     }
-    else if (app.type == AppLaunchTypeWebURL)
+    else if (launch.type == AppLaunchTypeWebURL)
     {
         NSString *commandPath = @"/usr/bin/osascript"; // Apple script
         NSString *scriptPath = [[NSBundle mainBundle] pathForResource:@"openChromeURL" ofType:@"scpt"];
-        NSLog(@"Launching url: %@", app.webURL);
+        NSLog(@"Launching url: %@", launch.webURL);
         [task setLaunchPath:commandPath];
         grepName = @"\"Google Chrome\""; // ?
-        [task setArguments:@[scriptPath, app.webURL]];
+        [task setArguments:@[scriptPath, launch.webURL]];
     }
-    else if (app.type == AppLaunchTypeAppPath)
+    else if (launch.type == AppLaunchTypeAppPath)
     {
-        NSLog(@"Launching app: %@", app.path);
+        NSLog(@"Launching app: %@", launch.path);
         [task setLaunchPath:@"/usr/bin/open"];
         
         // -F: Asks to open the app "Fresh"
-        [task setArguments:@[@"-F", app.path]];
-        grepName = app.path;
+        [task setArguments:@[@"-F", launch.path]];
+        grepName = launch.path;
     }
-    else if (app.type == AppLaunchTypeVideo)
+    else if (launch.type == AppLaunchTypeVideo)
     {
-        NSLog(@"Launching video: %@", app.path);
+        NSLog(@"Launching video: %@", launch.path);
         NSString *commandPath = @"/usr/bin/osascript"; // Apple script
         NSString *scriptPath = [[NSBundle mainBundle] pathForResource:@"openVideo" ofType:@"scpt"];
         [task setLaunchPath:commandPath];
-        [task setArguments:@[scriptPath, app.path]];
+        [task setArguments:@[scriptPath, launch.path]];
         grepName = @"QuickTime Player";
     }
     
-    if (app.wallpaperPath)
+    if (launch.wallpaperPath)
     {
-        std::string cppPath([app.wallpaperPath UTF8String]);
+        std::string cppPath([launch.wallpaperPath UTF8String]);
         ci::fs::path wallpaperPath(cppPath);
         
         // TODO: Take screen position into account.
@@ -245,7 +246,7 @@
                                            kCommandParamDelim,
                                            kCommandLaunchApp,
                                            kCommandParamDelim,
-                                           app.killName,
+                                           launch.killName,
                                            kCommandParamDelim,
                                            errorString
                                            ]
@@ -283,7 +284,7 @@
                                                kCommandParamDelim,
                                                kCommandLaunchApp,
                                                kCommandParamDelim,
-                                               app.killName,
+                                               launch.killName,
                                                kCommandParamDelim,
                                                errorString]
                                               dataUsingEncoding:NSUTF8StringEncoding]
@@ -295,11 +296,11 @@
             
             NSData *data = [file readDataToEndOfFile];
             NSString *string = [[NSString alloc] initWithData:data encoding: NSUTF8StringEncoding];
-            NSArray *lines = [string componentsSeparatedByString:@"\n"];
+//            NSArray *lines = [string componentsSeparatedByString:@"\n"];
             
-            ITPApp *app = _apps[killName];
-            app.pid = nil;
+            ITPClientLaunch *launch = _launches[killName];
             
+            /*
             for (NSString *line in lines)
             {
                 if ([line rangeOfString:killName].location != NSNotFound &&
@@ -312,6 +313,7 @@
             }
             
             NSLog(@"App launched with PID: %@", app.pid);
+            */
 //            NSLog(@"Grep returned: %@", lines);
             
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -319,7 +321,7 @@
                 [_serverSocket writeData:[[NSString stringWithFormat:@"%@%@%@",
                                            kCommandAppWasLaunched,
                                            kCommandParamDelim,
-                                           app.killName]
+                                           launch.killName]
                                           dataUsingEncoding:NSUTF8StringEncoding]
                              withTimeout:-1
                                      tag:0];
@@ -333,13 +335,14 @@
     [task launch];
 }
 
-- (void)killApp:(ITPApp *)app
+- (void)killApp:(ITPClientLaunch *)launch
 {
     NSTask *task;
     task = [[NSTask alloc] init];
     
-    NSString *killName = app.killName;
+    NSString *killName = launch.killName;
     NSString *scriptPath = nil;
+    /*
     BOOL isKillingWithPID = false;
     if (app.pid && [app.pid intValue] != 0)
     {
@@ -349,11 +352,11 @@
         [task setArguments: @[@"-9", [app.pid stringValue]]];
     }
     else
-    {
-        NSLog(@"Attempting to kill app named: >>%@<<", app.killName);
+    {*/
+        NSLog(@"Attempting to kill app named: >>%@<<", launch.killName);
         scriptPath = @"/usr/bin/pkill";
-        [task setArguments: @[@"-9", app.killName]];
-    }
+        [task setArguments: @[@"-9", launch.killName]];
+    //}
     
     [task setLaunchPath: scriptPath];
     
@@ -369,6 +372,7 @@
             NSData *data = [file readDataToEndOfFile];
             NSString *errorString = [[NSString alloc] initWithData:data encoding: NSUTF8StringEncoding];
 
+            /*
             if (isKillingWithPID)
             {
                 // NOTE: If killing using a PID throws an error, try killing with it's name
@@ -376,7 +380,7 @@
                 return [self killApp:app];
             }
             else
-            {
+            {*/
                 NSLog(@"Kill returned error status: %@", errorString);
                 dispatch_async(dispatch_get_main_queue(), ^{
                     // Tell the server that we've launched
@@ -385,14 +389,14 @@
                                                kCommandParamDelim,
                                                kCommandKillApp,
                                                kCommandParamDelim,
-                                               app.killName,
+                                               launch.killName,
                                                kCommandParamDelim,
                                                errorString]
                                               dataUsingEncoding:NSUTF8StringEncoding]
                                  withTimeout:-1
                                          tag:0];
                 });
-            }
+            //}
             return;
         }
         
@@ -400,12 +404,12 @@
         // NSString *outputString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            ITPApp *app = _apps[killName];
-            app.pid = nil;
+            ITPClientLaunch *launch = _launches[killName];
+            // app.pid = nil;
             [_serverSocket writeData:[[NSString stringWithFormat:@"%@%@%@",
                                        kCommandAppWasKilled,
                                        kCommandParamDelim,
-                                       app.killName]
+                                       launch.killName]
                                       dataUsingEncoding:NSUTF8StringEncoding]
                          withTimeout:-1
                                  tag:0];

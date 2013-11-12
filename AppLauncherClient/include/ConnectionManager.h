@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 //#include "DisplayApp.hpp"
 
-@class ITPApp;
+@class ITPClientLaunch;
 class DisplayApp;
 
 @interface ConnectionManager : NSObject
@@ -17,7 +17,7 @@ class DisplayApp;
 - (id)initWithApp:(DisplayApp *)cinderApp;
 - (void)disconnect;
 - (void)connectOnPort:(int)portNum;
-- (void)killApp:(ITPApp *)app;
-- (void)launchApp:(ITPApp *)app;
+- (void)killApp:(ITPClientLaunch *)app;
+- (void)launchApp:(ITPClientLaunch *)app;
 
 @end

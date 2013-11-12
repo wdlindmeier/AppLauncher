@@ -13,6 +13,7 @@
   </machines>
   <apps>
     <app>
+      <name>QuickTime two.mov</name>
       <duration-seconds>10</duration-seconds>
       <!-- An example of launch-video. Opens a video with Quicktime in full screen. 
            Seems to be picky about the filetype. Works with .mov files.
@@ -22,6 +23,7 @@
       <kill-name>QuickTime Player</kill-name>
     </app>
     <app>
+      <name>VLC command launch one.mp4</name>
       <duration-seconds>5</duration-seconds>
       <!-- An example of launch-command using the VLC player. -->
       <launch-command>/usr/bin/open -a VLC -F /Users/bill/Documents/ITP/BIG-AppLauncher/one.mp4 --args --fullscreen</launch-command>   

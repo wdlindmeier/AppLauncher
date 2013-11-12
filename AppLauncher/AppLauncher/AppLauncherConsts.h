@@ -20,7 +20,10 @@ static NSString * const kXMLElementShouldLoop = @"loop";
 static NSString * const kXMLElementAutoAdvance = @"auto-advance";
 static NSString * const kXMLElementSleepBetweenApps = @"duration-interlude-seconds";
 static NSString * const kXMLElementDebug = @"debug";
+static NSString * const kXMLElementName = @"name";
 static NSString * const kXMLElementClientIP = @"client-ip";
+
+static NSString * const kITPClientKeyDefault = @"default";
 
 static NSString * const kCommandAppWasKilled = @"KILLED";
 static NSString * const kCommandError = @"ERROR";

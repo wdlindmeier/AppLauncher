@@ -15,9 +15,9 @@
     self = [super init];
     if (self)
     {
-        self.wallpaperPath = @"";
         self.durationSeconds = 0;
-        self.pid = nil;
+        self.clientLaunches = @{};
+        self.name = @"Unnamed";
     }
     return self;
 }

@@ -10,31 +10,40 @@
   <auto-advance>true</auto-advance>
   <machines>
     <client-ip>127.0.0.1</client-ip>
+    <client-ip>10.0.1.2</client-ip>
   </machines>
   <apps>
     <!-- Launch App -->
     <app>
+      <name>Silly App 1</name>
       <duration-seconds>8</duration-seconds>
       <launch-app>/Users/bill/Documents/ITP/BIG-AppLauncher/repo/apps/SillyApp1.app</launch-app>
       <wallpaper-path>/Users/bill/Documents/ITP/BIG-AppLauncher/repo/wallpapers/wallpaper_1.jpg</wallpaper-path>
       <kill-name>SillyApp1</kill-name>
+      <launch-app client-ip="10.0.1.2">/Users/bill/Documents/ITP/BIG-AppLauncher/repo/apps/SillyApp3.app</launch-app>
+      <wallpaper-path client-ip="10.0.1.2">/Users/bill/Documents/ITP/BIG-AppLauncher/repo/wallpapers/wallpaper_3.jpg</wallpaper-path>
+      <kill-name client-ip="10.0.1.2">SillyApp3</kill-name>
     </app>  
+    <!-- Launch URL -->
+    <app>
+      <name>Search Engine URLs</name>    
+      <duration-seconds>8</duration-seconds>
+      <launch-url>http://google.com</launch-url>
+      <launch-url client-ip="10.0.1.2">http://bing.com</launch-url>
+      <wallpaper-path>/Users/bill/Documents/ITP/BIG-AppLauncher/repo/wallpapers/wallpaper_1.jpg</wallpaper-path>
+      <kill-name>Google Chrome</kill-name>
+    </app>
     <!-- Launch Video -->
     <app>
+      <name>ITP Screens QuickTime Video</name>
       <duration-seconds>8</duration-seconds>
       <launch-video>/Users/bill/Documents/ITP/BIG-AppLauncher/two.mov</launch-video>
       <wallpaper-path>/Users/bill/Documents/ITP/BIG-AppLauncher/repo/wallpapers/wallpaper_1.jpg</wallpaper-path>
       <kill-name>QuickTime Player</kill-name>
     </app>
-    <!-- Launch URL -->
-    <app>
-      <duration-seconds>8</duration-seconds>
-      <launch-url>http://google.org</launch-url>
-      <wallpaper-path>/Users/bill/Documents/ITP/BIG-AppLauncher/repo/wallpapers/wallpaper_1.jpg</wallpaper-path>
-      <kill-name>Google Chrome</kill-name>
-    </app>
     <!-- Launch Command -->
     <app>
+      <name>Cosmos VLC Video</name>
       <duration-seconds>8</duration-seconds>
       <launch-command>/usr/bin/open -a VLC -F /Users/bill/Documents/ITP/BIG-AppLauncher/one.mp4 --args --fullscreen</launch-command>   
       <wallpaper-path>/Users/bill/Documents/ITP/BIG-AppLauncher/repo/wallpapers/wallpaper_1.jpg</wallpaper-path>

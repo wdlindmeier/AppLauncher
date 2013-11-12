@@ -13,6 +13,7 @@
   </machines>
   <apps>
     <app>
+      <name>Wired.com</name>
       <duration-seconds>5</duration-seconds>
       <!-- An example of launch-command. Fires a custom apple script. -->
       <launch-command>/usr/bin/osascript /Users/bill/Documents/ITP/BIG-AppLauncher/openChromeURL.scpt http://wired.com</launch-command>
@@ -20,6 +21,7 @@
       <kill-name>Google Chrome</kill-name>
     </app>
     <app>
+      <name>Google.org</name>
       <duration-seconds>5</duration-seconds>
       <!-- An example of launch-url. Opens in borderless Google Chrome. -->
       <launch-url>http://google.org</launch-url>

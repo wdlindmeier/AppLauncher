@@ -27,6 +27,7 @@ typedef void (^ConnectionCompletionBlock)(void);
     NSMutableArray *_apps;
     NSMutableArray *_clientAddresses;
     ITPApp *_lastApp;
+    NSString *_currentClientAddress;
     int _currentAppIndex;
     NSTimer *_timer;
     NSTimeInterval _timeAppLaunched;
@@ -331,7 +332,8 @@ typedef void (^ConnectionCompletionBlock)(void);
 {
     if ([socket isConnected])
     {
-        NSLog(@"Sending string on socket: %@", socket);
+        //NSLog(@"Sending string on socket: %@", socket);
+        NSLog(@"Sending message: %@", message);
         [socket writeData:[message dataUsingEncoding:NSUTF8StringEncoding]
               withTimeout:-1
                       tag:0];
@@ -378,6 +380,57 @@ typedef void (^ConnectionCompletionBlock)(void);
     return YES;
 }
 
+#pragma mark - Apps
+
+// Make sure each client also has the attributes of the default client.
+- (void)updateLastAppLaunchDefaults
+{
+    ITPClientLaunch *defaultLaunch = _lastApp.clientLaunches[kITPClientKeyDefault];
+    NSLog(@"defaultLaunch: %@", defaultLaunch);
+    if (defaultLaunch)
+    {
+        for (NSString *clientAddress in _lastApp.clientLaunches)
+        {
+            if (clientAddress != kITPClientKeyDefault)
+            {
+                ITPClientLaunch *clientLaunch = _lastApp.clientLaunches[clientAddress];
+                if (clientLaunch.type == AppLaunchTypeUnknown)
+                {
+                    clientLaunch.type = defaultLaunch.type;
+                    switch (clientLaunch.type)
+                    {
+                        case AppLaunchTypeAppPath:
+                        case AppLaunchTypeVideo:
+                            clientLaunch.path = defaultLaunch.path;
+                            break;
+                        case AppLaunchTypeCommand:
+                            clientLaunch.command = defaultLaunch.command;
+                            break;
+                        case AppLaunchTypeWebURL:
+                            clientLaunch.webURL = defaultLaunch.webURL;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                
+                if (!clientLaunch.killName)
+                {
+                    clientLaunch.killName = defaultLaunch.killName;
+                }
+                
+                if (!clientLaunch.wallpaperPath)
+                {
+                    clientLaunch.wallpaperPath = defaultLaunch.wallpaperPath;
+                }
+                
+                NSLog(@"clientLaunch: %@", clientLaunch);
+
+            }
+        }
+    }
+}
+
 #pragma mark - XML
 
 - (void)parserDidStartDocument:(NSXMLParser *)parser
@@ -388,13 +441,25 @@ typedef void (^ConnectionCompletionBlock)(void);
     _clientAddresses = [NSMutableArray new];
 }
 
-- (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qualifiedName attributes:(NSDictionary *)attributeDict
+- (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName
+  namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qualifiedName
+    attributes:(NSDictionary *)attributeDict
 {
     [self handleLastXMLElement];
+    _currentClientAddress = attributeDict[kXMLElementClientIP];
+    if (!_currentClientAddress)
+    {
+        // Send any unspecified params to "default" (all)
+        _currentClientAddress = kITPClientKeyDefault;
+    }
     _xmlElementName = elementName;
     _xmlElementValue = [[NSMutableString alloc] init];
     if ([_xmlElementName isEqualToString:kXMLElementApp])
     {
+        if (_lastApp)
+        {
+            [self updateLastAppLaunchDefaults];
+        }
         _lastApp = [ITPApp new];
         [_apps addObject:_lastApp];
     }
@@ -409,6 +474,12 @@ typedef void (^ConnectionCompletionBlock)(void);
 {
     [self handleLastXMLElement];
     _xmlElementName = nil;
+
+    if (_lastApp)
+    {
+        [self updateLastAppLaunchDefaults];
+    }
+    
     NSLog(@"Done loading document.\nApps:\n%@\nClients:\n%@", _apps, _clientAddresses);
     [self updateViewForApps];
 }
@@ -433,6 +504,21 @@ BOOL XMLToBOOL(NSString *xmlValue)
     return lcv && lcv.length > 0 && ([lcv isEqualToString:@"1"] || [lcv isEqualToString:@"true"]);
 }
 
+- (ITPClientLaunch *)currentLaunch
+{
+    ITPClientLaunch *launch = _lastApp.clientLaunches[_currentClientAddress];
+    if (!launch)
+    {
+        launch = [[ITPClientLaunch alloc] init];
+        launch.clientAddress = _currentClientAddress;
+        NSMutableDictionary *launches = [NSMutableDictionary
+                                         dictionaryWithDictionary:_lastApp.clientLaunches];
+        launches[_currentClientAddress] = launch;
+        _lastApp.clientLaunches = [launches copy];
+    }
+    return launch;
+}
+
 - (void)handleLastXMLElement
 {
     NSString *value = [_xmlElementValue stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
@@ -442,32 +528,35 @@ BOOL XMLToBOOL(NSString *xmlValue)
     }
     else if ([_xmlElementName isEqualToString:kXMLElementLaunchUrl])
     {
-        _lastApp.webURL = value;
-        _lastApp.type = AppLaunchTypeWebURL;
+        [self currentLaunch].webURL = value;
+        [self currentLaunch].type = AppLaunchTypeWebURL;
     }
     else if ([_xmlElementName isEqualToString:kXMLElementLaunchCommand])
     {
-        // TODO: Make this launch path relative to the known paths
-        _lastApp.command = value;
-        _lastApp.type = AppLaunchTypeCommand;
+        [self currentLaunch].command = value;
+        [self currentLaunch].type = AppLaunchTypeCommand;
     }
     else if ([_xmlElementName isEqualToString:kXMLElementLaunchApp])
     {
-        _lastApp.path = value;
-        _lastApp.type = AppLaunchTypeAppPath;
+        [self currentLaunch].path = value;
+        [self currentLaunch].type = AppLaunchTypeAppPath;
     }
     else if ([_xmlElementName isEqualToString:kXMLElementLaunchVideo])
     {
-        _lastApp.path = value;
-        _lastApp.type = AppLaunchTypeVideo;
+        [self currentLaunch].path = value;
+        [self currentLaunch].type = AppLaunchTypeVideo;
     }
     else if ([_xmlElementName isEqualToString:kXMLElementKillName])
     {
-        _lastApp.killName = value;
+        [self currentLaunch].killName = value;
+    }
+    else if ([_xmlElementName isEqualToString:kXMLElementName])
+    {
+        _lastApp.name = value;
     }
     else if ([_xmlElementName isEqualToString:kXMLElementWallpaperPath])
     {
-        _lastApp.wallpaperPath = value;
+        [self currentLaunch].wallpaperPath = value;
     }
     else if ([_xmlElementName isEqualToString:kXMLElementShouldLoop])
     {
@@ -530,41 +619,45 @@ BOOL XMLToBOOL(NSString *xmlValue)
         [self.buttonStart setEnabled:NO];
         [self.buttonStop setEnabled:YES];
         
-        self.currentAppName = app.killName;
+        self.currentAppName = app.name;
         self.currentTimeRemaining = @"--";
-        
         self.numAppsLaunched = 0;
-        
-        NSString *value;
-        if (app.type == AppLaunchTypeCommand)
-        {
-            value = app.command;
-        }
-        else if (app.type == AppLaunchTypeWebURL)
-        {
-            value = app.webURL;
-        }
-        else if (app.type == AppLaunchTypeAppPath)
-        {
-            value = app.path;
-        }
-        else if (app.type == AppLaunchTypeVideo)
-        {
-            value = app.path;
-        }
-        NSString *message = [NSString stringWithFormat:@"%@%@%@%@%@%@%i%@%@",
-                             kCommandLaunchApp,
-                             kCommandParamDelim,
-                             app.killName,
-                             kCommandParamDelim,
-                             value,
-                             kCommandParamDelim,
-                             app.type,
-                             kCommandParamDelim,
-                             app.wallpaperPath];
         
         for (NSString *hostName in self.sockets)
         {
+            ITPClientLaunch *launch = app.clientLaunches[hostName];
+            if (!launch)
+            {
+                launch = app.clientLaunches[kITPClientKeyDefault];
+                assert(launch);
+            }
+            NSString *value;
+            if (launch.type == AppLaunchTypeCommand)
+            {
+                value = launch.command;
+            }
+            else if (launch.type == AppLaunchTypeWebURL)
+            {
+                value = launch.webURL;
+            }
+            else if (launch.type == AppLaunchTypeAppPath)
+            {
+                value = launch.path;
+            }
+            else if (launch.type == AppLaunchTypeVideo)
+            {
+                value = launch.path;
+            }
+            NSString *message = [NSString stringWithFormat:@"%@%@%@%@%@%@%i%@%@",
+                                 kCommandLaunchApp,
+                                 kCommandParamDelim,
+                                 launch.killName,
+                                 kCommandParamDelim,
+                                 value,
+                                 kCommandParamDelim,
+                                 launch.type,
+                                 kCommandParamDelim,
+                                 launch.wallpaperPath ? launch.wallpaperPath : @""];
             [self sendMessage:message toSocket:self.sockets[hostName]];
         }
     }];
@@ -577,20 +670,24 @@ BOOL XMLToBOOL(NSString *xmlValue)
         [_timer invalidate];
         _timer = nil;
         
-        NSString *killMessage = [NSString stringWithFormat:@"%@%@%@%@%i",
-                                 kCommandKillApp,
-                                 kCommandParamDelim,
-                                 app.killName,
-                                 kCommandParamDelim,
-                                 [app.pid intValue]];
-        
         for (NSString *hostName in self.sockets)
         {
+            ITPClientLaunch *launch = app.clientLaunches[hostName];
+            if (!launch)
+            {
+                launch = app.clientLaunches[kITPClientKeyDefault];
+                assert(launch);
+            }
+
+            NSString *killMessage = [NSString stringWithFormat:@"%@%@%@%@",
+                                     kCommandKillApp,
+                                     kCommandParamDelim,
+                                     launch.killName,
+                                     kCommandParamDelim];
+        
             [self sendMessage:killMessage toSocket:self.sockets[hostName]];
         }
-        
-        app.pid = nil;
-        
+
         [self.buttonStart setEnabled:YES];
         [self.buttonStop setEnabled:NO];
         
@@ -669,27 +766,15 @@ BOOL XMLToBOOL(NSString *xmlValue)
     ITPApp *app = _apps[rowIndex];
     if ([aTableColumn.identifier isEqualToString:@"name"])
     {
-        return app.killName;
+        return app.name;
     }
     else if ([aTableColumn.identifier isEqualToString:@"duration"])
     {
-        // 1 == Duration
         return app.durationSeconds;
     }
-    else if ([aTableColumn.identifier isEqualToString:@"path"])
+    else if ([aTableColumn.identifier isEqualToString:@"auto kill"])
     {
-        // 2 == Path
-        switch (app.type)
-        {
-            case AppLaunchTypeAppPath:
-                return app.path;
-            case AppLaunchTypeVideo:
-                return app.path;
-            case AppLaunchTypeWebURL:
-                return app.webURL;
-            case AppLaunchTypeCommand:
-                return app.command;
-        }
+        return @"n/a";
     }
     return @"?";
 }
