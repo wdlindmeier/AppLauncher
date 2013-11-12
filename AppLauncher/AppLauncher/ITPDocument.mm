@@ -17,6 +17,7 @@ typedef void (^ConnectionCompletionBlock)(void);
 @property (atomic, assign) int numAppsLaunched;
 @property (atomic, strong) NSMutableDictionary *sockets;
 @property (atomic, strong) ConnectionCompletionBlock connectedBlock;
+@property (atomic, assign) BOOL isAdvancing;
 
 @end
 
@@ -41,6 +42,7 @@ typedef void (^ConnectionCompletionBlock)(void);
     {
         _xmlElementName = nil;
         _currentAppIndex = -1;
+        self.isAdvancing = NO;
         self.connectedBlock = nil;
         self.isDebug = true;
         self.timeSleepBetweenLaunches = 3.0f;
@@ -74,70 +76,23 @@ typedef void (^ConnectionCompletionBlock)(void);
     [self connectToHosts];
 }
 
-- (void)connectToHosts
++ (BOOL)autosavesInPlace
 {
-    self.sockets = [[NSMutableDictionary alloc] initWithCapacity:1];
-
-    for (NSString *clientIP in _clientAddresses)
-    {
-        GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:self
-                                                            delegateQueue:dispatch_get_main_queue()];
-        
-        NSError *connectError = nil;
-        if (![socket connectToHost:clientIP onPort:kConnectionPort error:&connectError])
-        {
-            NSLog(@"ERROR: Couldn't connect to socket: %@", connectError);
-        }
-        
-        // Always add the socket event if it doesn't
-        // connect because we can reconnect later
-        self.sockets[clientIP] = socket;
-    }
+    return NO;
 }
 
-- (void)performUponConnection:(ConnectionCompletionBlock)completionBlock
+- (BOOL)applicationShouldOpenUntitledFile:(NSApplication *)sender
 {
-    self.connectedBlock = completionBlock;
-    int numConnected = 0;
-
-    // Make sure all of the sockets are connected
-    for (NSString *hostName in self.sockets)
-    {
-        GCDAsyncSocket *socket = self.sockets[hostName];
-        
-        if (socket.isConnected)
-        {
-            numConnected += 1;
-        }
-        else
-        {
-            NSError *connectError = nil;
-            if (![socket connectToHost:hostName
-                                onPort:kConnectionPort
-                                 error:&connectError])
-            {
-                self.connectedBlock = nil;
-
-                NSString *errorMessage = [NSString stringWithFormat:@"Couldn't reconnect to host %@\n%@",
-                                          hostName,
-                                          [connectError localizedDescription]];
-                NSLog(@"CONNECTION ERROR:\n%@", connectError);
-                
-                NSAlert *alert = [NSAlert alertWithMessageText:@"Connection Error"
-                                                 defaultButton:@"OK"
-                                               alternateButton:nil
-                                                   otherButton:nil
-                                     informativeTextWithFormat:@"%@", errorMessage];
-                [alert runModal];
-            }
-        }
-    }
-    if (numConnected == self.sockets.count)
-    {
-        self.connectedBlock = nil;
-        completionBlock();
-    }
+    return NO;
 }
+
+- (void)close
+{
+    [self disconnectSockets];
+    [super close];
+}
+
+#pragma mark - View
 
 - (void)updateViewForApps
 {
@@ -154,16 +109,6 @@ typedef void (^ConnectionCompletionBlock)(void);
         [self.buttonStart setEnabled:NO];
         [self.buttonStop setEnabled:NO];
     }
-}
-
-+ (BOOL)autosavesInPlace
-{
-    return NO;
-}
-
-- (BOOL)applicationShouldOpenUntitledFile:(NSApplication *)sender
-{
-    return NO;
 }
 
 #pragma mark - Socket Delegate
@@ -204,15 +149,15 @@ typedef void (^ConnectionCompletionBlock)(void);
 - (void)socket:(GCDAsyncSocket *)sock didReadData:(NSData *)data withTag:(long)tag
 {
     NSString *response = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-//	NSLog(@"socket:%p didReadData:%@ withTag:%ld", sock, response, tag);
-    
+
     NSArray *tokens = [response componentsSeparatedByString:kCommandParamDelim];
     
     if (tokens.count > 0)
     {
         NSString *command = tokens[0];
-        // TODO: This should varify that it's the correct app name
-        if ([command isEqualToString:kCommandAppWasLaunched] && self.numAppsLaunched < self.sockets.count)
+
+        if ([command isEqualToString:kCommandAppWasLaunched]
+            && self.numAppsLaunched < self.sockets.count)
         {
             self.numAppsLaunched += 1;;
             
@@ -232,24 +177,19 @@ typedef void (^ConnectionCompletionBlock)(void);
         else if ([command isEqualToString:kCommandAppWasKilled] && self.numAppsLaunched > 0)
         {
             self.numAppsLaunched -= 1;
-            
-            if (self.numAppsLaunched <= 0 && self.shouldAutoAdvance)
-            {
-                NSLog(@"ALL APPS KILLED. Advancing.");
-                double delayInSeconds = self.timeSleepBetweenLaunches;
-                dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
-                dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
-                    [self launchNextApp];
-                });
-            }
+            [self advanceIfAllAppsKilled];
         }
         else if ([command isEqualToString:kCommandError])
         {
             if (tokens.count > 3)
             {
                 NSString *errorTask = tokens[1];
-                NSString *appName = tokens[2];
+                NSString *appID = tokens[2];
                 NSString *errorReason = tokens[3];
+                int appIdx = [appID intValue];
+                ITPApp *app = _apps[appIdx];
+                assert(app.appID == appIdx); // These should be the same
+                
                 if (!errorReason || errorReason.length == 0)
                 {
                     if ([errorTask isEqualToString:kCommandKillApp])
@@ -265,7 +205,8 @@ typedef void (^ConnectionCompletionBlock)(void);
                         errorReason = @"Unknown";
                     }
                 }
-                NSLog(@"ERROR completing task: %@ on app %@. Reason:\n%@", errorTask, appName, errorReason);
+                NSLog(@"ERROR completing task: %@ on app %@. Reason:\n%@",
+                      errorTask, app.name, errorReason);
                 
                 if ([errorTask isEqualToString:kCommandKillApp])
                 {
@@ -285,7 +226,7 @@ typedef void (^ConnectionCompletionBlock)(void);
                                                    alternateButton:nil
                                                        otherButton:nil
                                          informativeTextWithFormat:@"There was an error completing the task: %@\nApp: %@\nReason: %@",
-                                      errorTask, appName, errorReason];
+                                      errorTask, app.name, errorReason];
                     [alert runModal];
                 }
             }
@@ -345,7 +286,73 @@ typedef void (^ConnectionCompletionBlock)(void);
     }
 }
 
-// TODO: Call when the document closes
+#pragma mark - Connection
+
+- (void)connectToHosts
+{
+    self.sockets = [[NSMutableDictionary alloc] initWithCapacity:1];
+    
+    for (NSString *clientIP in _clientAddresses)
+    {
+        GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:self
+                                                            delegateQueue:dispatch_get_main_queue()];
+        
+        NSError *connectError = nil;
+        if (![socket connectToHost:clientIP onPort:kConnectionPort error:&connectError])
+        {
+            NSLog(@"ERROR: Couldn't connect to socket: %@", connectError);
+        }
+        
+        // Always add the socket event if it doesn't
+        // connect because we can reconnect later
+        self.sockets[clientIP] = socket;
+    }
+}
+
+- (void)performUponConnection:(ConnectionCompletionBlock)completionBlock
+{
+    self.connectedBlock = completionBlock;
+    int numConnected = 0;
+    
+    // Make sure all of the sockets are connected
+    for (NSString *hostName in self.sockets)
+    {
+        GCDAsyncSocket *socket = self.sockets[hostName];
+        
+        if (socket.isConnected)
+        {
+            numConnected += 1;
+        }
+        else
+        {
+            NSError *connectError = nil;
+            if (![socket connectToHost:hostName
+                                onPort:kConnectionPort
+                                 error:&connectError])
+            {
+                self.connectedBlock = nil;
+                
+                NSString *errorMessage = [NSString stringWithFormat:@"Couldn't reconnect to host %@\n%@",
+                                          hostName,
+                                          [connectError localizedDescription]];
+                NSLog(@"CONNECTION ERROR:\n%@", connectError);
+                
+                NSAlert *alert = [NSAlert alertWithMessageText:@"Connection Error"
+                                                 defaultButton:@"OK"
+                                               alternateButton:nil
+                                                   otherButton:nil
+                                     informativeTextWithFormat:@"%@", errorMessage];
+                [alert runModal];
+            }
+        }
+    }
+    if (numConnected == self.sockets.count)
+    {
+        self.connectedBlock = nil;
+        completionBlock();
+    }
+}
+
 - (void)disconnectSockets
 {
     // Stop any client connections
@@ -362,10 +369,6 @@ typedef void (^ConnectionCompletionBlock)(void);
 
 - (NSData *)dataOfType:(NSString *)typeName error:(NSError **)outError
 {
-    // Insert code here to write your document to data of the specified type. If outError != NULL, ensure that you create and set an appropriate error when returning nil.
-    // You can also choose to override -fileWrapperOfType:error:, -writeToURL:ofType:error:, or -writeToURL:ofType:forSaveOperation:originalContentsURL:error: instead.
-    NSException *exception = [NSException exceptionWithName:@"UnimplementedMethod" reason:[NSString stringWithFormat:@"%@ is unimplemented", NSStringFromSelector(_cmd)] userInfo:nil];
-    @throw exception;
     return nil;
 }
 
@@ -386,7 +389,7 @@ typedef void (^ConnectionCompletionBlock)(void);
 - (void)updateLastAppLaunchDefaults
 {
     ITPClientLaunch *defaultLaunch = _lastApp.clientLaunches[kITPClientKeyDefault];
-    NSLog(@"defaultLaunch: %@", defaultLaunch);
+    // NSLog(@"defaultLaunch: %@", defaultLaunch);
     if (defaultLaunch)
     {
         for (NSString *clientAddress in _lastApp.clientLaunches)
@@ -424,7 +427,7 @@ typedef void (^ConnectionCompletionBlock)(void);
                     clientLaunch.wallpaperPath = defaultLaunch.wallpaperPath;
                 }
                 
-                NSLog(@"clientLaunch: %@", clientLaunch);
+                // NSLog(@"clientLaunch: %@", clientLaunch);
 
             }
         }
@@ -435,8 +438,6 @@ typedef void (^ConnectionCompletionBlock)(void);
 
 - (void)parserDidStartDocument:(NSXMLParser *)parser
 {
-    NSLog(@"START XML");
-    //the parser started this document. what are you going to do?
     _apps = [NSMutableArray new];
     _clientAddresses = [NSMutableArray new];
 }
@@ -461,6 +462,7 @@ typedef void (^ConnectionCompletionBlock)(void);
             [self updateLastAppLaunchDefaults];
         }
         _lastApp = [ITPApp new];
+        _lastApp.appID = _apps.count;
         [_apps addObject:_lastApp];
     }
 }
@@ -648,10 +650,10 @@ BOOL XMLToBOOL(NSString *xmlValue)
             {
                 value = launch.path;
             }
-            NSString *message = [NSString stringWithFormat:@"%@%@%@%@%@%@%i%@%@",
+            NSString *message = [NSString stringWithFormat:@"%@%@%i%@%@%@%i%@%@",
                                  kCommandLaunchApp,
                                  kCommandParamDelim,
-                                 launch.killName,
+                                 app.appID,
                                  kCommandParamDelim,
                                  value,
                                  kCommandParamDelim,
@@ -665,8 +667,8 @@ BOOL XMLToBOOL(NSString *xmlValue)
 
 - (void)killApp:(ITPApp *)app
 {
-    [self performUponConnection:^() {
-    
+    [self performUponConnection:^()
+    {
         [_timer invalidate];
         _timer = nil;
         
@@ -678,14 +680,24 @@ BOOL XMLToBOOL(NSString *xmlValue)
                 launch = app.clientLaunches[kITPClientKeyDefault];
                 assert(launch);
             }
-
-            NSString *killMessage = [NSString stringWithFormat:@"%@%@%@%@",
-                                     kCommandKillApp,
-                                     kCommandParamDelim,
-                                     launch.killName,
-                                     kCommandParamDelim];
-        
-            [self sendMessage:killMessage toSocket:self.sockets[hostName]];
+            
+            if (launch.killName)
+            {
+                NSString *killMessage = [NSString stringWithFormat:@"%@%@%i%@%@",
+                                         kCommandKillApp,
+                                         kCommandParamDelim,
+                                         app.appID,
+                                         kCommandParamDelim,
+                                         launch.killName];
+            
+                [self sendMessage:killMessage toSocket:self.sockets[hostName]];
+            }
+            else
+            {
+                // NOTE: If there is no kill name, let it keep running.
+                // This can be used for MPE Server.
+                self.numAppsLaunched -= 1;
+            }
         }
 
         [self.buttonStart setEnabled:YES];
@@ -694,7 +706,28 @@ BOOL XMLToBOOL(NSString *xmlValue)
         self.currentAppName = @"None";
         self.currentTimeRemaining = @"--";
         
+        [self advanceIfAllAppsKilled];
     }];
+}
+
+- (void)advanceIfAllAppsKilled
+{
+    // Added a lock (self.isAdvancing) around the timeout.
+    // We don't want to advance more than once during the delay.
+    if (!self.isAdvancing &&
+        self.numAppsLaunched <= 0 &&
+        self.shouldAutoAdvance)
+    {
+        NSLog(@"ALL APPS KILLED. Advancing.");
+        self.isAdvancing = YES;
+        double delayInSeconds = self.timeSleepBetweenLaunches;
+        dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+        dispatch_after(popTime, dispatch_get_main_queue(), ^(void)
+                       {
+                           self.isAdvancing = NO;
+                           [self launchNextApp];
+                       });
+    }
 }
 
 #pragma mark - Timer
@@ -774,7 +807,27 @@ BOOL XMLToBOOL(NSString *xmlValue)
     }
     else if ([aTableColumn.identifier isEqualToString:@"auto kill"])
     {
-        return @"n/a";
+        int possibleKills = (int)app.clientLaunches.count;
+        int numKills = 0;
+
+        for (NSString *clientAddr in app.clientLaunches)
+        {
+            ITPClientLaunch *launch = app.clientLaunches[clientAddr];
+            if (launch.killName)
+            {
+                numKills++;
+            }
+        }
+        if (numKills == possibleKills)
+        {
+            return @"True";
+        }
+        else if (numKills == 0)
+        {
+            return @"False";
+        }
+
+        return [NSString stringWithFormat:@"%i/%i", numKills, possibleKills];
     }
     return @"?";
 }

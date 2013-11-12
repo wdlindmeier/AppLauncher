@@ -60,6 +60,12 @@ Originaly developed for the [Big Screens](http://itp.nyu.edu/bigscreens/) course
   <apps>
   
     <app>
+      <!-- 	name:
+          	A descriptive title. Displayed in the launcher window. 
+          	Required.
+      -->
+      <name>10</name>
+    
       <!-- 	duration-seconds:
       		The duration in seconds that the app should run. 
       		If this value is 0, the launcher won't quit the app
@@ -89,12 +95,23 @@ Originaly developed for the [Big Screens](http://itp.nyu.edu/bigscreens/) course
       <launch-url>https://www.shadertoy.com/view/XslGRr</launch-url>
       <launch-video>/AppLauncher/apps/FullScreenMovie.mov</launch-video>
       <launch-command>/usr/bin/osascript /AppLauncher/scripts/launchApp.scpt</launch-command>
+
+      <!-- 	"client-ip" attribute: 
+    		Some app values can also take a "client-ip" attribute. This allows
+    		you to specify unique values for different machines (e.g. unique
+    		launch paths). Values that can use the "client-ip" attribute:
+    		• All launch values (path/url/video/command)
+    		• kill-name
+    		• wallpaper-path
+	  -->      
+      <launch-path client-ip="10.0.1.2">/AppLauncher/apps/SillyApp999.app</launch-path>
       
       <!-- 	kill-name:
-      		The app "kill name". This is used as a unique identifier and 
-      		should be the same name used with the pkill command. 
-      		This is generally the name of the app bundle minus the ".app". 
-      		Required.
+      		The app "kill name". This should be the string used with the 
+      		pkill command (using the -f modifier). This is generally the name 
+      		of the app bundle minus the ".app".
+      		Required if you want the app to stop running after the duration.
+      		Otherwise the app will continue to run when the next app is launched.
       -->
       <kill-name>SillyApp0</kill-name>
       

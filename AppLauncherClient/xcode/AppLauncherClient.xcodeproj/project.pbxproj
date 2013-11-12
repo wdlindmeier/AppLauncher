@@ -86,7 +86,6 @@
 				46E8D23CE9834B438C15957B /* AppLauncherClientApp.mm */,
 				A9D8A6AB17FC5F030080A0EE /* ConnectionManager.mm */,
 				A903A07817F66DDB00C28835 /* ITPApp.m */,
-				A9C3E34E1831DB14003C3DA5 /* ITPClientLaunch.h */,
 				A9C3E34F1831DB14003C3DA5 /* ITPClientLaunch.m */,
 			);
 			name = Source;
@@ -146,6 +145,7 @@
 				A9D8A6AD17FC5F150080A0EE /* ConnectionManager.h */,
 				A9D8A6B117FC679B0080A0EE /* DisplayApp.hpp */,
 				A903A07717F66DDB00C28835 /* ITPApp.h */,
+				A9C3E34E1831DB14003C3DA5 /* ITPClientLaunch.h */,
 				5926AD3FD9A44A3D82574473 /* Resources.h */,
 			);
 			name = Headers;

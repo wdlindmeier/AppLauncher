@@ -14,5 +14,6 @@
 @property (nonatomic, strong) NSNumber *durationSeconds;
 @property (nonatomic, strong) NSDictionary *clientLaunches;
 @property (nonatomic, strong) NSString *name;
+@property (nonatomic, assign) int appID;
 
 @end

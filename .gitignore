@@ -18,3 +18,4 @@ DerivedData
 .idea/
 schedules/iac.schedule
 schedules/itp.schedule
+schedules/test.schedule

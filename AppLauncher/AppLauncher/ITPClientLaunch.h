@@ -26,6 +26,7 @@ typedef enum AppLaunchTypes
 @property (nonatomic, strong) NSString *command; // E.g. /usr/bin/bigscreens app.script
 
 @property (nonatomic, assign) AppLaunchType type;
+@property (nonatomic, assign) BOOL dontKill;
 @property (nonatomic, strong) NSString *clientAddress;
 
 @property (nonatomic, strong) NSString *killName;

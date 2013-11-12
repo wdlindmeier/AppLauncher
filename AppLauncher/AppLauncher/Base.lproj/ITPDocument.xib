@@ -80,7 +80,7 @@
                         </textFieldCell>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="04J-Xt-f3S">
-                        <rect key="frame" x="90" y="119" width="117" height="19"/>
+                        <rect key="frame" x="90" y="119" width="267" height="19"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="None" id="xvQ-4u-rgD">
                             <font key="font" size="13" name="HelveticaNeue"/>

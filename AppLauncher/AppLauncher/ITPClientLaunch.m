@@ -16,6 +16,7 @@
     if (self)
     {
         self.type = AppLaunchTypeUnknown;
+        self.dontKill = false;
     }
     return self;
 }

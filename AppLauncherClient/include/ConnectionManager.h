@@ -17,7 +17,7 @@ class DisplayApp;
 - (id)initWithApp:(DisplayApp *)cinderApp;
 - (void)disconnect;
 - (void)connectOnPort:(int)portNum;
-- (void)killApp:(ITPClientLaunch *)app;
-- (void)launchApp:(ITPClientLaunch *)app;
+- (void)killApp:(ITPClientLaunch *)app withID:(NSString *)appID;
+- (void)launchApp:(ITPClientLaunch *)app withID:(NSString *)appID;
 
 @end
