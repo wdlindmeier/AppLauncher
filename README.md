@@ -64,7 +64,7 @@ Originaly developed for the [Big Screens](http://itp.nyu.edu/bigscreens/) course
           	A descriptive title. Displayed in the launcher window. 
           	Required.
       -->
-      <name>10</name>
+      <name>Silly App 0</name>
     
       <!-- 	duration-seconds:
       		The duration in seconds that the app should run. 
@@ -124,6 +124,7 @@ Originaly developed for the [Big Screens](http://itp.nyu.edu/bigscreens/) course
     </app>
     
     <app>
+      <name>Silly App 1</name>
       <duration-seconds>5</duration-seconds>
       <launch-path>/AppLauncher/apps/SillyApp1.app</launch-path>
       <kill-name>SillyApp1</kill-name>
@@ -131,6 +132,7 @@ Originaly developed for the [Big Screens](http://itp.nyu.edu/bigscreens/) course
     </app>
     
     <app>
+      <name>Silly App 2</name>
       <duration-seconds>10</duration-seconds>
       <launch-path>/AppLauncher/SillyApp2.app</launch-path>
       <kill-name>SillyApp2</kill-name>
