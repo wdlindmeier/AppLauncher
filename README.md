@@ -67,16 +67,16 @@ Originaly developed for the [Big Screens](http://itp.nyu.edu/bigscreens/) course
       <name>Silly App 0</name>
     
       <!-- 	duration-seconds:
-      		The duration in seconds that the app should run. 
-      		If this value is 0, the launcher won't quit the app
-			until the "stop" button is pressed.
-      		Required.
+      		The duration in seconds that the app should run before
+      		the next app launches. If this value is 0, the launcher 
+      		won't quit the app until the "stop" button is pressed.			Required.
       -->
       <duration-seconds>10</duration-seconds>
             
       <!-- 	launch-path:
       		The absolute path to the application.  
-      		This must be the same on all machines. 
+      		This must be the same on all machines unless it has a
+      		"client-ip" attribute (see below).
           
           	launch-url:
           	A URL to your content. 
@@ -103,6 +103,9 @@ Originaly developed for the [Big Screens](http://itp.nyu.edu/bigscreens/) course
     		• All launch values (path/url/video/command)
     		• kill-name
     		• wallpaper-path
+    		
+    		Any value that doesn't have a specific client-ip will be the "default"
+    		value for each client.
 	  -->      
       <launch-path client-ip="10.0.1.2">/AppLauncher/apps/SillyApp999.app</launch-path>
       
@@ -111,7 +114,7 @@ Originaly developed for the [Big Screens](http://itp.nyu.edu/bigscreens/) course
       		pkill command (using the -f modifier). This is generally the name 
       		of the app bundle minus the ".app".
       		Required if you want the app to stop running after the duration.
-      		Otherwise the app will continue to run when the next app is launched.
+      		Otherwise, the app will continue to run when the next app is launched.
       -->
       <kill-name>SillyApp0</kill-name>
       
@@ -147,7 +150,7 @@ Originaly developed for the [Big Screens](http://itp.nyu.edu/bigscreens/) course
 
 ###Important Notes
 
-When an app (or video, url, etc.) has timed out, AppLauncher will **force quit** the application. This means all windows will close and any work-in-progress will be unsaved. 
+When an app (or video, url, etc.) has timed out, AppLauncher will **force quit** the application (if it has a kill-name). This means all windows will close and any work-in-progress will be unsaved. 
 
 ###Contents
 
