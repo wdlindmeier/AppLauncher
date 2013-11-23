@@ -13,11 +13,11 @@ Originaly developed for the [Big Screens](http://itp.nyu.edu/bigscreens/) course
 ![image](https://raw.github.com/wdlindmeier/AppLauncher/master/misc/launcher_screenshot.png)
 
 ###Instructions
-1) Create a directory on all of the client machines that contatins the apps and wallpapers. This path must be identical on each machine.  
+1) Create a directory on all of the client machines that contatins the apps and wallpapers.  
 
 2) Open apps/AppLauncherClient on all of the client machines. This app coordinates with the Launcher to start and stop local processes. The client opens in full-screen mode, but this can be toggled by pressing 'f'.  
 
-3) Open AppLauncher on the controller machine. When it boots, you'll be asked to select a .schedule file. You can find a sample in the "schedules" folder. This is the format to create your own:  
+3) Open AppLauncher on the controller machine. When it launches, you'll be asked to select a .schedule file. You can find a sample in the "schedules" folder. Here is the format to create your own:  
 
 ```xml
 <schedule>
